@@ -1,0 +1,8 @@
+# Runtime dependencies - Hand Gesture Mouse
+opencv-python>=4.8
+mediapipe>=0.10.14
+numpy>=1.24
+PyAutoGUI>=0.9.54
+PyGetWindow>=0.0.9
+pynput>=1.7.6
+PySide6>=6.5

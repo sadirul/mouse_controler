@@ -1,0 +1,203 @@
+/* Gesture animations. Every demo shares --t (its duration / playback speed) so the hand and the
+   screen scene stay synchronised. Finger segments rotate around their knuckle (local origin). */
+
+.demo { --speed: 1; --t: calc(var(--dur, 3s) / var(--speed)); }
+.demo.slow { --speed: 0.5; }
+.demo.paused *, .demo.offscreen * { animation-play-state: paused !important; }
+
+.demo .seg, .demo .hand, .demo .cursor { transform-box: view-box; transform-origin: 0 0; }
+.demo .ripple, .demo .ctx-menu, .demo .em-badge, .demo .close-armed, .demo .alttab, .demo .drag-file .scr-file,
+.demo .lp-button, .demo .dbl-icon { transform-box: fill-box; transform-origin: center; }
+
+/* shared pieces ---------------------------------------------------------------------------------- */
+.ripple { fill: none; stroke: var(--accent-2); stroke-width: 2.5; opacity: 0; }
+.ring-bg { fill: none; stroke: var(--ring-bg); stroke-width: 6; }
+.ring { fill: none; stroke: var(--warn); stroke-width: 6; stroke-linecap: round; stroke-dashoffset: var(--c); }
+.palm-ring { stroke: var(--danger); }
+
+@keyframes ripple-pop { 0% { opacity: 0.9; transform: scale(0.2); } 100% { opacity: 0; transform: scale(1.7); } }
+
+/* 1. cursor movement ------------------------------------------------------------------------------ */
+.demo-move .hand { animation: move-hand var(--t) ease-in-out infinite; }
+.demo-move .cursor { animation: move-cursor var(--t) ease-in-out infinite; }
+@keyframes move-hand {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-38px, -22px); }
+  40% { transform: translate(38px, -22px); }
+  60% { transform: translate(38px, 22px); }
+  80% { transform: translate(-38px, 22px); }
+}
+@keyframes move-cursor {
+  0%, 100% { transform: translate(118px, 78px); }
+  20% { transform: translate(52px, 40px); }
+  40% { transform: translate(184px, 40px); }
+  60% { transform: translate(184px, 118px); }
+  80% { transform: translate(52px, 118px); }
+}
+
+/* 2. single click ---------------------------------------------------------------------------------- */
+.demo-click .f-index { animation: pinch-index var(--t) ease-in-out infinite; }
+.demo-click .f-thumb { animation: pinch-thumb var(--t) ease-in-out infinite; }
+.demo-click .ripple { animation: click-ripple var(--t) linear infinite; }
+.demo-click .scr-button { animation: click-button var(--t) linear infinite; }
+@keyframes pinch-index {
+  0%, 28% { transform: rotate(-6deg); }
+  42%, 56% { transform: rotate(-40deg) scale(1, 0.62); }
+  70%, 100% { transform: rotate(-6deg); }
+}
+@keyframes pinch-thumb {
+  0%, 28% { transform: rotate(-35deg); }
+  42%, 56% { transform: rotate(-17.3deg); }
+  70%, 100% { transform: rotate(-35deg); }
+}
+@keyframes click-ripple {
+  0%, 55% { opacity: 0; transform: scale(0.2); }
+  56% { opacity: 0.9; transform: scale(0.2); }
+  80% { opacity: 0; transform: scale(1.8); }
+  100% { opacity: 0; }
+}
+@keyframes click-button { 0%, 54% { fill: var(--btn); } 56%, 70% { fill: var(--accent); } 80%, 100% { fill: var(--btn); } }
+
+/* 3. double click ---------------------------------------------------------------------------------- */
+.demo-double-click .f-index { animation: dbl-index var(--t) ease-in-out infinite; }
+.demo-double-click .f-thumb { animation: dbl-thumb var(--t) ease-in-out infinite; }
+.demo-double-click .r1 { animation: dbl-r1 var(--t) linear infinite; }
+.demo-double-click .r2 { animation: dbl-r2 var(--t) linear infinite; }
+.demo-double-click .dbl-window { animation: dbl-window var(--t) ease-out infinite; }
+.demo-double-click .dbl-icon .scr-folder { animation: dbl-icon var(--t) linear infinite; }
+@keyframes dbl-index {
+  0%, 12% { transform: rotate(-6deg); }
+  20%, 24% { transform: rotate(-40deg) scale(1, 0.62); }
+  31%, 34% { transform: rotate(-6deg); }
+  41%, 45% { transform: rotate(-40deg) scale(1, 0.62); }
+  52%, 100% { transform: rotate(-6deg); }
+}
+@keyframes dbl-thumb {
+  0%, 12% { transform: rotate(-35deg); }
+  20%, 24% { transform: rotate(-17.3deg); }
+  31%, 34% { transform: rotate(-35deg); }
+  41%, 45% { transform: rotate(-17.3deg); }
+  52%, 100% { transform: rotate(-35deg); }
+}
+@keyframes dbl-r1 { 0%, 23% { opacity: 0; transform: scale(0.2); } 24% { opacity: 0.9; } 38%, 100% { opacity: 0; transform: scale(1.7); } }
+@keyframes dbl-r2 { 0%, 44% { opacity: 0; transform: scale(0.2); } 45% { opacity: 0.9; } 58%, 100% { opacity: 0; transform: scale(1.7); } }
+@keyframes dbl-window { 0%, 52% { opacity: 0; } 60%, 90% { opacity: 1; } 97%, 100% { opacity: 0; } }
+@keyframes dbl-icon { 0%, 23% { fill: var(--folder); } 24%, 60% { fill: var(--accent); } 61%, 100% { fill: var(--folder); } }
+
+/* 4. right click ----------------------------------------------------------------------------------- */
+.demo-right-click .f-middle { animation: rc-middle var(--t) ease-in-out infinite; }
+.demo-right-click .f-thumb { animation: rc-thumb var(--t) ease-in-out infinite; }
+.demo-right-click .ctx-menu { animation: rc-menu var(--t) ease-out infinite; }
+@keyframes rc-middle {
+  0%, 28% { transform: rotate(-1deg); }
+  42%, 56% { transform: rotate(-45deg) scale(1, 0.55); }
+  70%, 100% { transform: rotate(-1deg); }
+}
+@keyframes rc-thumb {
+  0%, 28% { transform: rotate(-35deg); }
+  42%, 56% { transform: rotate(-0.6deg) scale(1, 0.93); }
+  70%, 100% { transform: rotate(-35deg); }
+}
+@keyframes rc-menu { 0%, 47% { opacity: 0; transform: scale(0.85); } 52%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; } }
+
+/* 5. long press ------------------------------------------------------------------------------------ */
+.demo-long-press .f-index { animation: lp-index var(--t) ease-in-out infinite; }
+.demo-long-press .f-thumb { animation: lp-thumb var(--t) ease-in-out infinite; }
+.demo-long-press .hold-ring { animation: lp-ring var(--t) linear infinite; }
+.demo-long-press .lp-ring, .demo-long-press .lp-screen-ring { animation: lp-ring-vis var(--t) linear infinite; }
+.demo-long-press .lp-button { animation: lp-button var(--t) linear infinite; }
+@keyframes lp-index { 0%, 8% { transform: rotate(-6deg); } 18%, 80% { transform: rotate(-40deg) scale(1, 0.62); } 92%, 100% { transform: rotate(-6deg); } }
+@keyframes lp-thumb { 0%, 8% { transform: rotate(-35deg); } 18%, 80% { transform: rotate(-17.3deg); } 92%, 100% { transform: rotate(-35deg); } }
+@keyframes lp-ring { 0%, 18% { stroke-dashoffset: var(--c); stroke: var(--warn); } 45% { stroke-dashoffset: 0; stroke: var(--warn); } 46%, 100% { stroke-dashoffset: 0; stroke: var(--ok); } }
+@keyframes lp-ring-vis { 0%, 15% { opacity: 0; } 18%, 82% { opacity: 1; } 88%, 100% { opacity: 0; } }
+@keyframes lp-button { 0%, 45% { fill: var(--btn); transform: scale(1); } 46%, 82% { fill: var(--ok); transform: scale(0.94); } 88%, 100% { fill: var(--btn); transform: scale(1); } }
+
+/* 6. drag and drop --------------------------------------------------------------------------------- */
+.demo-drag .f-index { animation: drag-index var(--t) ease-in-out infinite; }
+.demo-drag .f-thumb { animation: drag-thumb var(--t) ease-in-out infinite; }
+.demo-drag .hand { animation: drag-hand var(--t) ease-in-out infinite; }
+.demo-drag .drag-file { animation: drag-file var(--t) ease-in-out infinite; }
+.demo-drag .drop-target .scr-folder { animation: drag-target var(--t) linear infinite; }
+@keyframes drag-index { 0%, 6% { transform: rotate(-6deg); } 15%, 70% { transform: rotate(-40deg) scale(1, 0.62); } 80%, 100% { transform: rotate(-6deg); } }
+@keyframes drag-thumb { 0%, 6% { transform: rotate(-35deg); } 15%, 70% { transform: rotate(-17.3deg); } 80%, 100% { transform: rotate(-35deg); } }
+@keyframes drag-hand { 0%, 20% { transform: translate(-30px, 8px); } 65%, 85% { transform: translate(40px, -6px); } 100% { transform: translate(-30px, 8px); } }
+@keyframes drag-file {
+  0%, 20% { transform: translate(52px, 82px); opacity: 1; }
+  65% { transform: translate(186px, 62px); opacity: 1; }
+  74% { transform: translate(187px, 66px) scale(0.5); opacity: 0; }
+  92% { transform: translate(52px, 82px); opacity: 0; }
+  100% { transform: translate(52px, 82px); opacity: 1; }
+}
+@keyframes drag-target { 0%, 50% { fill: var(--folder); } 56%, 78% { fill: var(--accent); } 84%, 100% { fill: var(--folder); } }
+
+/* 7. vertical scroll ------------------------------------------------------------------------------- */
+.demo-scroll-vertical .hand { animation: vs-hand var(--t) ease-in-out infinite; }
+.demo-scroll-vertical .vscroll-content { animation: vs-content var(--t) ease-in-out infinite; }
+.demo-scroll-vertical .vscroll-bar { animation: vs-bar var(--t) ease-in-out infinite; }
+@keyframes vs-hand { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(0, -34px); } 50% { transform: translate(0, 0); } 75% { transform: translate(0, 34px); } }
+@keyframes vs-content { 0%, 100% { transform: translate(0, -45px); } 25% { transform: translate(0, 0); } 50% { transform: translate(0, -45px); } 75% { transform: translate(0, -90px); } }
+@keyframes vs-bar { 0%, 100% { transform: translate(0, 31px); } 25% { transform: translate(0, 0); } 50% { transform: translate(0, 31px); } 75% { transform: translate(0, 62px); } }
+
+/* 8. horizontal scroll ----------------------------------------------------------------------------- */
+.demo-scroll-horizontal .hand { animation: hs-hand var(--t) ease-in-out infinite; }
+.demo-scroll-horizontal .hscroll-content { animation: hs-content var(--t) ease-in-out infinite; }
+@keyframes hs-hand { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(36px, 0); } 50% { transform: translate(0, 0); } 75% { transform: translate(-36px, 0); } }
+@keyframes hs-content { 0%, 100% { transform: translate(-80px, 0); } 25% { transform: translate(-160px, 0); } 50% { transform: translate(-80px, 0); } 75% { transform: translate(0, 0); } }
+
+/* 9. window move ----------------------------------------------------------------------------------- */
+.demo-window-move .hand { animation: wm-hand var(--t) ease-in-out infinite; }
+.demo-window-move .moving-window { animation: wm-window var(--t) ease-in-out infinite; }
+.demo-window-move .moving-window .scr-title { animation: wm-title var(--t) linear infinite; }
+@keyframes wm-hand { 0%, 15% { transform: translate(-24px, -12px); } 60%, 75% { transform: translate(30px, 16px); } 100% { transform: translate(-24px, -12px); } }
+@keyframes wm-window { 0%, 15% { transform: translate(0, 0); } 60%, 82% { transform: translate(96px, 44px); } 92% { transform: translate(96px, 44px); opacity: 0; } 96% { transform: translate(0, 0); opacity: 0; } 100% { opacity: 1; } }
+@keyframes wm-title { 0%, 12% { fill: var(--title); } 15%, 60% { fill: var(--accent); } 64%, 100% { fill: var(--title); } }
+
+/* 10. four-finger swipe ---------------------------------------------------------------------------- */
+.demo-window-swipe .hand { animation: sw-hand var(--t) ease-in-out infinite; }
+.demo-window-swipe .swipe-window { animation: sw-window var(--t) ease-out infinite; }
+@keyframes sw-hand { 0%, 22% { transform: translate(0, 24px); } 36%, 62% { transform: translate(0, -46px); } 90%, 100% { transform: translate(0, 24px); } }
+@keyframes sw-window { 0%, 40% { transform: translate(0, 0) scale(1, 1); } 50%, 88% { transform: translate(-120px, -81px) scale(2, 2.03); } 96%, 100% { transform: translate(0, 0) scale(1, 1); } }
+
+/* 11. horns -> switch app -------------------------------------------------------------------------- */
+.demo-horns .hold-ring { animation: hr-ring var(--t) linear infinite; }
+.demo-horns .alttab { animation: hr-alttab var(--t) ease-out infinite; }
+.demo-horns .alttab-sel { animation: hr-sel var(--t) ease-in-out infinite; }
+.demo-horns .alt-front { animation: hr-front var(--t) linear infinite; }
+@keyframes hr-ring { 0%, 10% { stroke-dashoffset: var(--c); } 40%, 100% { stroke-dashoffset: 0; } }
+@keyframes hr-alttab { 0%, 41% { opacity: 0; transform: scale(0.9); } 46%, 74% { opacity: 1; transform: scale(1); } 80%, 100% { opacity: 0; } }
+@keyframes hr-sel { 0%, 52% { transform: translate(0, 0); } 60%, 100% { transform: translate(46px, 0); } }
+@keyframes hr-front { 0%, 76% { opacity: 1; } 78%, 96% { opacity: 0; } 100% { opacity: 1; } }
+
+/* 12. thumb + pinky -> close (with confirmation) ---------------------------------------------------- */
+.demo-thumb-pinky .f-pinky { animation: tp-pinky var(--t) ease-in-out infinite; }
+.demo-thumb-pinky .f-thumb { animation: tp-thumb var(--t) ease-in-out infinite; }
+.demo-thumb-pinky .close-armed { animation: tp-armed var(--t) ease-out infinite; }
+.demo-thumb-pinky .close-window { animation: tp-window var(--t) ease-in infinite; }
+@keyframes tp-pinky {
+  0%, 6% { transform: rotate(10deg); } 14%, 30% { transform: rotate(-40deg) scale(1, 0.5); }
+  38%, 44% { transform: rotate(10deg); } 52%, 68% { transform: rotate(-40deg) scale(1, 0.5); } 76%, 100% { transform: rotate(10deg); }
+}
+@keyframes tp-thumb {
+  0%, 6% { transform: rotate(38deg) scale(1, 0.72); } 14%, 30% { transform: rotate(45.3deg) scale(1, 1.13); }
+  38%, 44% { transform: rotate(38deg) scale(1, 0.72); } 52%, 68% { transform: rotate(45.3deg) scale(1, 1.13); } 76%, 100% { transform: rotate(38deg) scale(1, 0.72); }
+}
+@keyframes tp-armed { 0%, 29% { opacity: 0; transform: scale(0.9); } 32%, 66% { opacity: 1; transform: scale(1); } 69%, 100% { opacity: 0; } }
+@keyframes tp-window { 0%, 66% { opacity: 1; transform: translate(0, 0); } 74%, 92% { opacity: 0; transform: translate(0, 12px); } 100% { opacity: 1; transform: translate(0, 0); } }
+
+/* 13. emergency stop ------------------------------------------------------------------------------- */
+.demo-emergency .palm-ring { animation: em-ring var(--t) linear infinite; }
+.demo-emergency .em-badge { animation: em-badge var(--t) ease-out infinite; }
+.demo-emergency .em-cursor .cursor-path { animation: em-cursor var(--t) linear infinite; }
+.demo-emergency .hand { animation: em-hand var(--t) ease-in-out infinite; }
+@keyframes em-hand { 0% { opacity: 0; transform: translate(0, 18px); } 8%, 92% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(0, 18px); } }
+@keyframes em-ring { 0%, 10% { stroke-dashoffset: var(--c); } 44% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; } }
+@keyframes em-badge { 0%, 44% { opacity: 0; transform: scale(0.8); } 50%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; } }
+@keyframes em-cursor { 0%, 44% { fill: var(--cursor); } 46%, 92% { fill: var(--danger); } 96%, 100% { fill: var(--cursor); } }
+
+/* hero: hand steering a cursor --------------------------------------------------------------------- */
+.hero-demo .hand { animation: move-hand 7s ease-in-out infinite; }
+.hero-demo .cursor { animation: move-cursor 7s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .demo *, .hero-demo * { animation-play-state: paused !important; }
+}

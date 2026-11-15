@@ -1,0 +1,46 @@
+{
+  "camera": {
+    "device": 0,
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "mirror": true
+  },
+  "tracking": {
+    "max_fps": 30,
+    "preferred_hand": "right",
+    "min_detection_confidence": 0.6,
+    "min_presence_confidence": 0.5,
+    "min_tracking_confidence": 0.5,
+    "min_hand_score": 0.6
+  },
+  "cursor": {
+    "mode": "absolute",
+    "speed": 1.0,
+    "smoothing": 0.55,
+    "responsiveness": 0.5,
+    "acceleration": 0.6,
+    "dead_zone_px": 2,
+    "pinch_damping": 0.35,
+    "region": {
+      "left": 0.15,
+      "right": 0.85,
+      "top": 0.12,
+      "bottom": 0.72
+    },
+    "monitor": "all"
+  },
+  "app": {
+    "minimize_to_tray": true,
+    "background_tracking": true,
+    "start_minimized": false,
+    "autostart": false,
+    "auto_start_tracking": false,
+    "show_preview": true,
+    "hotkeys_enabled": true,
+    "hotkey_pause": "<ctrl>+<alt>+p",
+    "hotkey_emergency": "<ctrl>+<alt>+x",
+    "hotkey_resume": "<ctrl>+<alt>+r",
+    "tray_notice_shown": true
+  }
+}

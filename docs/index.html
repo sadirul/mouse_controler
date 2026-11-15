@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hand Gesture Mouse - User Guide</title>
+  <meta name="description" content="Install, configure and use Hand Gesture Mouse: control your Windows mouse and windows with hand gestures in front of a webcam.">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn menu-btn" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
+  <a class="brand" href="#welcome"><img src="assets/icon.svg" alt=""><span>Hand Gesture Mouse<small>User guide · v1.0</small></span></a>
+  <div class="spacer"></div>
+  <a class="icon-btn table-link" href="#reference">Gesture table</a>
+  <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light or dark theme">Theme</button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Documentation sections">
+    <div class="group">Start</div>
+    <a href="#welcome">Welcome</a>
+    <a href="#how-it-works">How hand tracking works</a>
+    <a href="#requirements">System requirements</a>
+    <a href="#install">Installation guide</a>
+    <a href="#first-run">Your first minute</a>
+    <div class="group">Gestures</div>
+    <a href="#how-to-use">How to use</a>
+    <a class="sub" href="#g-move">Move the cursor</a>
+    <a class="sub" href="#g-click">Single click</a>
+    <a class="sub" href="#g-double">Double click</a>
+    <a class="sub" href="#g-right">Right click</a>
+    <a class="sub" href="#g-long">Long press</a>
+    <a class="sub" href="#g-drag">Drag and drop</a>
+    <a class="sub" href="#g-vscroll">Vertical scroll</a>
+    <a class="sub" href="#g-hscroll">Horizontal scroll</a>
+    <a class="sub" href="#g-window">Move a window</a>
+    <a class="sub" href="#g-swipe">Window swipes</a>
+    <a class="sub" href="#g-horns">Switch application</a>
+    <a class="sub" href="#g-close">Close a window</a>
+    <a class="sub" href="#g-stop">Emergency stop</a>
+    <a href="#reference">Gesture reference table</a>
+    <div class="group">Reference</div>
+    <a href="#app-guide">The application</a>
+    <a href="#customize">Customizing gestures</a>
+    <a href="#safety">Safety features</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#faq">FAQ</a>
+    <a href="#limitations">Platform support &amp; limits</a>
+  </nav>
+
+  <main>
+    <!-- =========================================================== WELCOME -->
+    <section id="welcome">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Touchless desktop control</div>
+          <h1>Your hand is the <span>mouse</span>.</h1>
+          <p class="lead">Hand Gesture Mouse watches your hand through a normal webcam and turns finger movements
+            into real Windows mouse actions: move the pointer with your index finger, pinch to click, drag files,
+            scroll pages, move and arrange windows - all without touching anything.</p>
+          <div class="cta">
+            <a class="btn primary" href="#install">Install in 5 minutes</a>
+            <a class="btn" href="#how-to-use">Learn the gestures</a>
+          </div>
+        </div>
+        <div class="hero-demo" id="hero-demo" aria-label="Animated hand moving a mouse cursor"></div>
+      </div>
+
+      <div class="grid cols-3" style="margin-top:22px">
+        <div class="card"><h3>What it does</h3><p class="muted">Controls the real system cursor, clicks, double-clicks,
+          right-clicks, long-presses, drag &amp; drop, vertical and horizontal scrolling, and window management
+          (move, minimize, maximize, restore, snap, switch, close).</p></div>
+        <div class="card"><h3>Built for safety</h3><p class="muted">An open palm stops everything instantly. Pause from the
+          dashboard, the tray or a global hotkey. Closing a window always needs confirmation, and system windows are
+          protected.</p></div>
+        <div class="card"><h3>Private &amp; offline</h3><p class="muted">Video never leaves your computer. Hand tracking
+          runs locally with Google MediaPipe; no account, no internet connection and no cloud service is needed.</p></div>
+      </div>
+
+      <h3 style="margin-top:28px">Supported gestures</h3>
+      <p>
+        <a class="chip" href="#g-move">☝ Move cursor</a><a class="chip" href="#g-click">Pinch → click</a>
+        <a class="chip" href="#g-double">Double pinch → double click</a><a class="chip" href="#g-right">Thumb + middle → right click</a>
+        <a class="chip" href="#g-long">Hold pinch → long press</a><a class="chip" href="#g-drag">Pinch &amp; move → drag</a>
+        <a class="chip" href="#g-vscroll">Two fingers → scroll</a><a class="chip" href="#g-hscroll">Two fingers sideways → horizontal scroll</a>
+        <a class="chip" href="#g-window">Three fingers → move window</a><a class="chip" href="#g-swipe">Four-finger swipes → window commands</a>
+        <a class="chip" href="#g-horns">Horns → switch app</a><a class="chip" href="#g-close">Thumb + pinky → close (confirmed)</a>
+        <a class="chip" href="#g-stop">Open palm → emergency stop</a>
+      </p>
+    </section>
+
+    <!-- =========================================================== HOW IT WORKS -->
+    <section id="how-it-works">
+      <div class="eyebrow">Under the hood</div>
+      <h2>How hand tracking works</h2>
+      <p class="lead">Every camera frame goes through a small pipeline. It runs at about 25-30 frames per second on a
+        typical laptop, on a background thread so the window always stays responsive.</p>
+      <div class="pipeline">
+        <div class="step"><b>1 · Webcam</b><span>A frame is captured (and mirrored so your movements feel natural).</span></div>
+        <div class="step"><b>2 · MediaPipe</b><span>21 landmarks per hand: wrist, every joint and every fingertip.</span></div>
+        <div class="step"><b>3 · Finger states</b><span>Each finger is extended, partially bent or folded; pinch distances are measured in hand sizes.</span></div>
+        <div class="step"><b>4 · Gesture engine</b><span>A debounced state machine decides the gesture, so gestures never conflict.</span></div>
+        <div class="step"><b>5 · Your computer</b><span>Smoothed cursor movement, clicks, scrolling and window commands.</span></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="card"><h3>Why the cursor is steady</h3><p class="muted">Raw fingertip positions jitter by a few pixels.
+          A One Euro filter smooths the cursor when your hand is still but stays fast when you move quickly, a small dead
+          zone ignores micro-movements, and while your thumb approaches your index finger the cursor slows down so clicks
+          land exactly where you aimed.</p></div>
+        <div class="card"><h3>Why gestures don't collide</h3><p class="muted">The gesture engine is always in exactly one
+          state. While you drag, clicks and scrolling are ignored; while you scroll, the cursor stays still. A pose must
+          be held for a short, configurable time before it counts, and every action has a cooldown. The emergency-stop
+          palm is checked before anything else.</p></div>
+      </div>
+    </section>
+
+    <!-- =========================================================== REQUIREMENTS -->
+    <section id="requirements">
+      <div class="eyebrow">Before you start</div>
+      <h2>System requirements</h2>
+      <div class="table-wrap"><table>
+        <tr><th>Item</th><th>Minimum</th><th>Recommended</th></tr>
+        <tr><td>Operating system</td><td>Windows 10 (64-bit)</td><td>Windows 11</td></tr>
+        <tr><td>Python (source install only)</td><td>3.10</td><td>3.11 - 3.13 (tested on 3.13)</td></tr>
+        <tr><td>Webcam</td><td>Any USB or built-in webcam, 640 × 480</td><td>30 FPS webcam, good lighting</td></tr>
+        <tr><td>Processor</td><td>Dual-core, 2 GHz</td><td>Quad-core or better (≈25 ms per frame)</td></tr>
+        <tr><td>Memory</td><td>4 GB RAM</td><td>8 GB RAM</td></tr>
+        <tr><td>Disk</td><td>600 MB (Python + packages)</td><td>-</td></tr>
+        <tr><td>Internet</td><td colspan="2">Only to download the program. It runs fully offline.</td></tr>
+      </table></div>
+    </section>
+
+    <!-- =========================================================== INSTALL -->
+    <section id="install">
+      <div class="eyebrow">Installation guide</div>
+      <h2>Install and run</h2>
+      <div class="callout info"><b>Using the ready-made Windows build?</b> Skip steps 1-4: unzip
+        <code>HandGestureMouse</code> anywhere and double-click <code>HandGestureMouse.exe</code>. Python is not needed.</div>
+      <ol class="steps">
+        <li>
+          <h4>Install Python</h4>
+          <p>Download Python 3.11 or newer from <a href="https://www.python.org/downloads/" rel="noopener">python.org</a>.
+            In the installer tick <b>“Add python.exe to PATH”</b>. Check it worked in a new terminal:</p>
+          <div class="code"><pre>python --version</pre></div>
+        </li>
+        <li>
+          <h4>Download the project</h4>
+          <p>Download and unzip the project, or clone it with Git, then open a terminal in the project folder:</p>
+          <div class="code"><pre>cd hand-gesture-mouse</pre></div>
+        </li>
+        <li>
+          <h4>Create a virtual environment</h4>
+          <p>This keeps the project's packages separate from the rest of your system.</p>
+          <div class="code"><pre>python -m venv .venv
+.venv\Scripts\activate</pre></div>
+          <p class="muted">PowerShell refuses to run the activate script? Run
+            <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once, or use Command Prompt.</p>
+        </li>
+        <li>
+          <h4>Install the dependencies</h4>
+          <p>OpenCV, MediaPipe, NumPy, PyAutoGUI, PyGetWindow, pynput and PySide6:</p>
+          <div class="code"><pre>pip install -r requirements.txt</pre></div>
+          <p class="muted">The hand-tracking model (<code>models/hand_landmarker.task</code>) ships with the project. If it is
+            missing, download it once:</p>
+          <div class="code"><pre>curl -L -o models\hand_landmarker.task https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task</pre></div>
+        </li>
+        <li>
+          <h4>Connect a webcam</h4>
+          <p>Plug in a USB webcam or use the built-in one. Close other apps that might use the camera (Teams, Zoom,
+            the Camera app). Sit so your hand is clearly visible about 40-80 cm from the camera, with light on your hand.</p>
+        </li>
+        <li>
+          <h4>Run the application</h4>
+          <div class="code"><pre>python main.py</pre></div>
+          <p class="muted">Options: <code>--minimized</code> starts in the system tray, <code>--start-tracking</code> starts
+            tracking immediately, <code>--self-test</code> checks camera, model, tracking speed and the gesture engine
+            (without moving your mouse) and shows a report.</p>
+        </li>
+        <li>
+          <h4>Allow camera access</h4>
+          <p>If the camera does not open, enable <b>Settings → Privacy &amp; security → Camera → Let desktop apps access
+            your camera</b> in Windows. The dashboard shows a clear message when access is blocked.</p>
+        </li>
+        <li>
+          <h4>Start gesture tracking</h4>
+          <p>Press <b>Start tracking</b> on the dashboard. You will see your hand with its 21 landmarks in the preview.
+            Raise your index finger and the cursor follows. For safety, tracking never starts automatically unless you
+            enable that in Settings.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- =========================================================== FIRST RUN -->
+    <section id="first-run">
+      <div class="eyebrow">Quick start</div>
+      <h2>Your first minute</h2>
+      <div class="grid cols-4">
+        <div class="card"><h3>1. Find the box</h3><p class="muted">The preview shows a grey “active area”. Your fingertip
+          inside that box covers the whole screen, so small hand movements are enough.</p></div>
+        <div class="card"><h3>2. Point</h3><p class="muted">Raise only your index finger. Move slowly at first - the cursor
+          follows smoothly.</p></div>
+        <div class="card"><h3>3. Pinch</h3><p class="muted">Tap your thumb tip against your index fingertip and open again.
+          That is one left click.</p></div>
+        <div class="card"><h3>4. Know the brake</h3><p class="muted">Show your open palm for 1.5 s, press
+          <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd>, or click <b>Emergency stop</b>. Everything stops.</p></div>
+      </div>
+      <div class="callout info"><b>Tip:</b> make a <b>fist</b> to “lift the mouse”: the cursor stays where it is while you
+        move your hand back to a comfortable position.</div>
+    </section>
+
+    <!-- =========================================================== HOW TO USE -->
+    <section id="how-to-use">
+      <div class="eyebrow">How to use</div>
+      <h2>Gesture-by-gesture tutorial</h2>
+      <p class="lead">Each animation shows the fingers involved on the left and what happens on your screen on the right.
+        Use <b>Pause</b>, <b>Replay</b> and <b>0.5×</b> to study a movement. Highlighted fingers are the ones that matter;
+        the cyan dot is your index fingertip (the cursor), the orange dot your thumb tip.</p>
+
+      <article class="gesture" id="g-move">
+        <div>
+          <h3><span class="num">1</span> Move the cursor <span class="badge">Index finger</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Raise your index finger; fold the other fingers (or let them relax).</li>
+            <li>Keep your hand inside the active area shown in the preview.</li>
+            <li>Move the fingertip - the cursor follows left, right, up and down.</li></ol>
+          <div class="label">Computer action</div><span class="action">Moves the mouse cursor</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Middle finger also raised - that is the scroll gesture, so the cursor stops.</li>
+            <li>Hand too close to the frame edge, where tracking is less accurate.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Make a fist to freeze the cursor and re-centre your hand.</li>
+            <li>Too fast or too slow? Change <b>Cursor speed</b> on the Cursor page.</li></ul>
+        </div>
+        <div data-demo="move"></div>
+      </article>
+
+      <article class="gesture" id="g-click">
+        <div>
+          <h3><span class="num">2</span> Single left click <span class="badge">Thumb + index pinch</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point at the target.</li><li>Touch your thumb tip to your index fingertip.</li><li>Open the pinch again.</li></ol>
+          <div class="label">Computer action</div><span class="action">One left click where the pinch started</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Pinching very slowly while moving - the cursor slows down near a pinch, but large hand
+            movement during the pinch becomes a drag.</li><li>Touching the side of the finger instead of the tip.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Holding the pinch never repeats the click.</li>
+            <li>The click is sent after the double-click window (350 ms) so a double click is never split into two
+              singles. Disable double click if you want instant clicks.</li></ul>
+        </div>
+        <div data-demo="click"></div>
+      </article>
+
+      <article class="gesture" id="g-double">
+        <div>
+          <h3><span class="num">3</span> Double click <span class="badge">Two quick pinches</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point at a file or folder.</li><li>Pinch and release twice quickly (within 350 ms by default).</li></ol>
+          <div class="label">Computer action</div><span class="action">Double left click (opens files and folders)</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Pausing too long between pinches - you get two single clicks instead.</li>
+            <li>Moving the hand away between pinches.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>The cursor is held still between the two pinches so both land on the same spot.</li>
+            <li>Raise <b>Max time between pinches</b> if your double clicks are not recognised.</li></ul>
+        </div>
+        <div data-demo="double-click"></div>
+      </article>
+
+      <article class="gesture" id="g-right">
+        <div>
+          <h3><span class="num">4</span> Right click <span class="badge">Thumb + middle pinch</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point at the item.</li><li>Touch your thumb tip to your <b>middle</b> fingertip.</li><li>Release.</li></ol>
+          <div class="label">Computer action</div><span class="action">One right click (context menu)</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Thumb also touching the index finger - that counts as a left pinch.</li>
+            <li>A tight fist: folded fingers never count as a pinch, by design.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Lift the index finger slightly out of the way.</li><li>A 400 ms cooldown prevents accidental repeats.</li></ul>
+        </div>
+        <div data-demo="right-click"></div>
+      </article>
+
+      <article class="gesture" id="g-long">
+        <div>
+          <h3><span class="num">5</span> Long press <span class="badge">Hold the pinch</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Pinch thumb and index finger.</li><li>Keep holding without moving for 0.8 s - a ring fills up in the preview.</li><li>Release when done.</li></ol>
+          <div class="label">Computer action</div><span class="action">Holds the left button down (or right click - your choice)</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Moving during the hold starts a drag instead (which also holds the button).</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Choose <b>Long press action</b> on the Gestures page: “press and hold” (drag activation) or “right click”.</li>
+            <li>The duration is adjustable from 0.3 to 3 seconds.</li></ul>
+        </div>
+        <div data-demo="long-press"></div>
+      </article>
+
+      <article class="gesture" id="g-drag">
+        <div>
+          <h3><span class="num">6</span> Drag and drop <span class="badge">Pinch, move, release</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point at a file, icon, text or window title bar.</li><li>Pinch and keep pinching.</li>
+            <li>Move your hand - the item follows.</li><li>Release the pinch to drop.</li></ol>
+          <div class="label">Computer action</div><span class="action">Button down → move → button up</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Opening the pinch mid-way drops the item early.</li>
+            <li>Hand leaving the camera view - the item is dropped after 0.25 s for safety.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>While dragging, motion follows your knuckles, not your fingertip, so the item doesn't jump when you pinch.</li>
+            <li>Clicks and scrolling are disabled during a drag.</li></ul>
+        </div>
+        <div data-demo="drag"></div>
+      </article>
+
+      <article class="gesture" id="g-vscroll">
+        <div>
+          <h3><span class="num">7</span> Vertical scroll <span class="badge">Two fingers up / down</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point at the page you want to scroll.</li><li>Raise index and middle fingers held together (others folded).</li>
+            <li>Move both fingers up to scroll up, down to scroll down.</li></ol>
+          <div class="label">Computer action</div><span class="action">Mouse-wheel scrolling (smooth)</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Spreading the fingers into a “V” - deliberately ignored to avoid accidents.</li>
+            <li>Expecting the cursor to move - it stays put while scrolling.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Change <b>Scroll speed</b>, or switch to <b>Joystick</b> style: hold the fingers above or below
+            the start point to keep scrolling.</li></ul>
+        </div>
+        <div data-demo="scroll-vertical"></div>
+      </article>
+
+      <article class="gesture" id="g-hscroll">
+        <div>
+          <h3><span class="num">8</span> Horizontal scroll <span class="badge">Two fingers left / right</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Make the same two-finger pose.</li><li>Move your hand left or right.</li></ol>
+          <div class="label">Computer action</div><span class="action">Horizontal wheel scrolling</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Starting diagonally: the first clear direction locks the axis until you release the pose.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Works in browsers, spreadsheets, timelines and file lists; some older apps ignore horizontal scrolling.</li></ul>
+        </div>
+        <div data-demo="scroll-horizontal"></div>
+      </article>
+
+      <article class="gesture" id="g-window">
+        <div>
+          <h3><span class="num">9</span> Move a window <span class="badge">Three fingers</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Click the window you want to move (it becomes the active window).</li>
+            <li>Raise index, middle and ring fingers and hold for ¼ s - the window is grabbed.</li>
+            <li>Move your hand; the window follows. Change pose to release it.</li></ol>
+          <div class="label">Computer action</div><span class="action">Moves the active window, keeping its size</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Pinky also raised - that is the four-finger swipe pose.</li>
+            <li>Trying to move an app running as administrator (see troubleshooting).</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Maximized windows are restored automatically when grabbed.</li>
+            <li>Prefer to grab the window under the cursor, or drag via the title bar? Both are options.</li></ul>
+        </div>
+        <div data-demo="window-move"></div>
+      </article>
+
+      <article class="gesture" id="g-swipe">
+        <div>
+          <h3><span class="num">10</span> Window swipes <span class="badge">Four fingers, thumb tucked</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Raise four fingers with your thumb folded across the palm.</li><li>Swipe quickly (under ⅔ s) in one direction.</li></ol>
+          <div class="label">Computer action (defaults)</div>
+          <span class="action">Up: maximize · Down: restore or minimize · Left/Right: snap to half screen</span>
+          <div class="label">Common mistakes</div>
+          <ul class="mistakes"><li>Thumb sticking out: that is the open palm (emergency stop when held).</li>
+            <li>Moving slowly - only quick swipes count, so you can relax your hand safely.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Every direction can be remapped (minimize, maximize, restore, snap, move to top, switch app...).</li></ul>
+        </div>
+        <div data-demo="window-swipe"></div>
+      </article>
+
+      <article class="gesture" id="g-horns">
+        <div>
+          <h3><span class="num">11</span> Switch application <span class="badge">Horns hold</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Raise index and pinky; fold middle and ring fingers.</li><li>Hold for 0.6 s.</li></ol>
+          <div class="label">Computer action (default)</div><span class="action">Alt + Tab - switch to the previous app</span>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Can be remapped to any window command.</li></ul>
+        </div>
+        <div data-demo="horns"></div>
+      </article>
+
+      <article class="gesture" id="g-close">
+        <div>
+          <h3><span class="num">12</span> Close a window <span class="badge">Thumb + pinky, twice</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Touch thumb and pinky tips and hold 0.7 s - “Close armed” appears.</li>
+            <li>Release, then repeat the hold within 4 s to confirm.</li><li>Do nothing to cancel.</li></ol>
+          <div class="label">Computer action (default)</div><span class="action">Closes the active window (asks to save if the app does)</span>
+          <div class="label">Safety</div>
+          <ul class="tips"><li>Never closes the desktop, taskbar or Hand Gesture Mouse itself.</li>
+            <li>Prefer a dialog? Set <b>Close confirmation</b> to “Show a confirmation dialog”.</li></ul>
+        </div>
+        <div data-demo="thumb-pinky"></div>
+      </article>
+
+      <article class="gesture" id="g-stop">
+        <div>
+          <h3><span class="num">13</span> Emergency stop <span class="badge">Open palm, 1.5 s</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Show your open palm, all five fingers spread, to the camera.</li><li>Hold for 1.5 seconds - the red ring fills.</li></ol>
+          <div class="label">Computer action</div><span class="action">Releases any held button and disables all gesture actions</span>
+          <div class="label">Resuming</div>
+          <ul class="tips"><li>Click <b>Resume control</b> on the dashboard or in the tray menu, or press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd>.</li>
+            <li>Gestures can never resume control - only you can.</li></ul>
+          <div class="label">Tip</div>
+          <ul class="tips"><li>A brief open palm is harmless: it is also the natural “resting” pose and does nothing.</li></ul>
+        </div>
+        <div data-demo="emergency"></div>
+      </article>
+    </section>
+
+    <!-- =========================================================== REFERENCE -->
+    <section id="reference">
+      <div class="eyebrow">Cheat sheet</div>
+      <h2>Gesture reference table</h2>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>Gesture</th><th>Hand action</th><th>Computer action</th></tr>
+        <tr><td><img class="thumb" src="assets/gestures/move.svg" alt=""></td><td>Index finger</td><td>Move index</td><td>Move cursor</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/click.svg" alt=""></td><td>Thumb + index pinch</td><td>Pinch and release</td><td>Left click</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/double_click.svg" alt=""></td><td>Two quick pinches</td><td>Pinch twice</td><td>Double click</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/right_click.svg" alt=""></td><td>Thumb + middle pinch</td><td>Pinch and release</td><td>Right click</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/long_press.svg" alt=""></td><td>Hold pinch</td><td>Maintain pinch 0.8 s</td><td>Long press</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/drag.svg" alt=""></td><td>Hold and move pinch</td><td>Move while pinching</td><td>Drag and drop</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/scroll_vertical.svg" alt=""></td><td>Two fingers vertical</td><td>Move up / down</td><td>Scroll</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/scroll_horizontal.svg" alt=""></td><td>Two fingers horizontal</td><td>Move left / right</td><td>Horizontal scroll</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/window_move.svg" alt=""></td><td>Three fingers</td><td>Hold and move</td><td>Move window</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/window_swipe.svg" alt=""></td><td>Four fingers, thumb tucked</td><td>Quick swipe</td><td>Maximize / restore-minimize / snap left / snap right</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/horns.svg" alt=""></td><td>Horns (index + pinky)</td><td>Hold 0.6 s</td><td>Switch application</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/thumb_pinky.svg" alt=""></td><td>Thumb + pinky pinch</td><td>Hold 0.7 s, then repeat</td><td>Close window (confirmed)</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/fist.svg" alt=""></td><td>Fist</td><td>Close the hand</td><td>Freeze cursor (reposition hand)</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/emergency_stop.svg" alt=""></td><td>Open palm</td><td>Hold for 1.5 seconds</td><td>Emergency stop</td></tr>
+      </table></div>
+      <p class="muted" style="margin-top:12px">Keyboard safety shortcuts (work even when the window is hidden):
+        <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd> pause / resume · <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd> emergency stop ·
+        <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> resume after a stop.</p>
+    </section>
+
+    <!-- =========================================================== APP GUIDE -->
+    <section id="app-guide">
+      <div class="eyebrow">The application</div>
+      <h2>Dashboard and settings pages</h2>
+      <p class="lead">Screenshots of the real application (the camera image is a synthetic test hand).</p>
+      <div class="gallery">
+        <figure><img src="assets/screenshots/dashboard.png" alt="Dashboard with live preview and status tiles" loading="lazy"><figcaption><b>Dashboard</b> - live preview with landmarks, camera / hand / FPS / gesture status, start, stop, pause and emergency stop.</figcaption></figure>
+        <figure><img src="assets/screenshots/dashboard_drag.png" alt="Dashboard while dragging" loading="lazy"><figcaption>Skeleton colour shows the current mode (orange = dragging).</figcaption></figure>
+        <figure><img src="assets/screenshots/dashboard_emergency.png" alt="Dashboard during emergency stop" loading="lazy"><figcaption>Emergency stop: everything disabled until you resume.</figcaption></figure>
+        <figure><img src="assets/screenshots/gestures.png" alt="Gesture settings" loading="lazy"><figcaption><b>Gestures</b> - enable, tune thresholds, durations and cooldowns, remap window commands.</figcaption></figure>
+        <figure><img src="assets/screenshots/camera.png" alt="Camera settings" loading="lazy"><figcaption><b>Camera</b> - webcam, resolution, FPS, mirroring, controlling hand, camera test.</figcaption></figure>
+        <figure><img src="assets/screenshots/cursor.png" alt="Cursor settings" loading="lazy"><figcaption><b>Cursor</b> - speed, smoothing, acceleration, dead zone, screen boundary and monitors.</figcaption></figure>
+        <figure><img src="assets/screenshots/activity_logs.png" alt="Activity logs" loading="lazy"><figcaption><b>Activity logs</b> - every action with time, gesture, result and error details.</figcaption></figure>
+        <figure><img src="assets/screenshots/settings.png" alt="Application settings" loading="lazy"><figcaption><b>Settings</b> - tray, background tracking, start with Windows, hotkeys.</figcaption></figure>
+      </div>
+      <div class="grid cols-2" style="margin-top:18px">
+        <div class="card"><h3>System tray</h3><p class="muted">Closing the window keeps the app in the tray (configurable).
+          The tray icon dot shows the state: green = active, amber = paused, red = emergency stop. Right-click for
+          Open dashboard, Start/Stop tracking, Pause gestures, Emergency stop and Exit. The webcam is always released on exit.</p></div>
+        <div class="card"><h3>Start with Windows</h3><p class="muted">Turn on <b>Start with Windows</b> in Settings to launch
+          minimized to the tray when you sign in. Tracking still waits for you unless you also enable
+          <b>Start tracking automatically</b>.</p></div>
+      </div>
+    </section>
+
+    <!-- =========================================================== CUSTOMIZE -->
+    <section id="customize">
+      <div class="eyebrow">Make it yours</div>
+      <h2>Customizing gestures</h2>
+      <p>Everything on the Gestures, Camera and Cursor pages applies instantly and is saved to two JSON files:
+        <code>config/settings.json</code> (camera, tracking, cursor, app) and <code>config/gestures.json</code> (gestures and
+        mappings). The packaged app stores them in <code>%APPDATA%\HandGestureMouse\config</code>.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Setting</th><th>Where</th><th>Default</th><th>Effect</th></tr>
+        <tr><td>Pinch threshold</td><td>Gestures → Left click</td><td>0.28 hand</td><td>How close thumb and finger must be. Raise if clicks are missed, lower if they trigger by accident.</td></tr>
+        <tr><td>Long-press duration</td><td>Gestures → Long press</td><td>800 ms</td><td>Hold time before a long press.</td></tr>
+        <tr><td>Double-click interval</td><td>Gestures → Double click</td><td>350 ms</td><td>Max time between the two pinches.</td></tr>
+        <tr><td>Cursor speed</td><td>Cursor</td><td>1.0×</td><td>Shrinks the active area so less movement covers the screen.</td></tr>
+        <tr><td>Smoothing / responsiveness</td><td>Cursor</td><td>0.55 / 0.5</td><td>Steadier vs. lower lag.</td></tr>
+        <tr><td>Scroll speed</td><td>Gestures → scroll</td><td>30</td><td>Wheel notches per frame-height of finger travel.</td></tr>
+        <tr><td>Cooldowns</td><td>Gestures</td><td>120-1200 ms</td><td>Minimum time before the same gesture can fire again.</td></tr>
+        <tr><td>Tracking FPS</td><td>Camera</td><td>30</td><td>Lower it to save CPU on slow machines.</td></tr>
+        <tr><td>Controlling hand</td><td>Camera</td><td>Right</td><td>Right, left or either. The other hand is ignored.</td></tr>
+        <tr><td>Emergency stop hold</td><td>Gestures → Emergency stop</td><td>1500 ms</td><td>How long the palm must be held.</td></tr>
+        <tr><td>Window command mappings</td><td>Gestures → swipes / horns / thumb + pinky</td><td>see table</td><td>Assign minimize, maximize, restore, close, switch app, snap left/right, move to top.</td></tr>
+      </table></div>
+    </section>
+
+    <!-- =========================================================== SAFETY -->
+    <section id="safety">
+      <div class="eyebrow">Safety</div>
+      <h2>Safety features</h2>
+      <div class="grid cols-2">
+        <div class="card"><h3>Stop, pause and resume</h3><ul class="muted">
+          <li>Open palm for 1.5 s, the red button, the tray menu or <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd> stop everything immediately and release held buttons.</li>
+          <li>Pause (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd>) keeps the preview running but performs no actions.</li>
+          <li>Losing sight of your hand for 0.25 s ends any drag or window move.</li></ul></div>
+        <div class="card"><h3>No accidental damage</h3><ul class="muted">
+          <li>Closing a window needs a second gesture or a dialog; the desktop, taskbar and this app can't be closed.</li>
+          <li>Gestures only trigger the fixed mouse/window actions listed here - never commands, scripts or typing.</li>
+          <li>Debouncing, hysteresis and cooldowns prevent duplicate clicks; tracking starts only when you press Start.</li></ul></div>
+      </div>
+    </section>
+
+    <!-- =========================================================== TROUBLESHOOTING -->
+    <section id="troubleshooting">
+      <div class="eyebrow">Help</div>
+      <h2>Troubleshooting</h2>
+      <details><summary>Camera not detected</summary><div><ul>
+        <li>Open the <b>Camera</b> page, press <b>Scan for cameras</b> and pick another device number.</li>
+        <li>Close Teams, Zoom, OBS or the Windows Camera app - a webcam can only be used by one program.</li>
+        <li>Unplug and reconnect a USB webcam, then press <b>Test camera</b>.</li></ul></div></details>
+      <details><summary>MediaPipe initialization error</summary><div><ul>
+        <li>Make sure <code>models/hand_landmarker.task</code> exists (≈7.8 MB) - download it with the command in step 4.</li>
+        <li>Reinstall: <code>pip install --force-reinstall mediapipe</code>. Use 64-bit Python 3.10-3.13.</li>
+        <li>Install the latest <a href="https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist" rel="noopener">Microsoft Visual C++ Redistributable</a>.</li></ul></div></details>
+      <details><summary>Fingers not detected</summary><div><ul>
+        <li>Light your hand from the front; avoid a bright window behind you.</li>
+        <li>Keep the whole hand in view, 40-80 cm from the camera, palm or back facing the camera.</li>
+        <li>Check <b>Controlling hand</b>: with “Right hand” selected your left hand is ignored. Choose “Either hand” to test.</li>
+        <li>Lower <b>Detection confidence</b> on the Camera page.</li></ul></div></details>
+      <details><summary>Cursor shaking</summary><div><ul>
+        <li>Increase <b>Smoothing</b> and the <b>Dead zone</b> on the Cursor page.</li>
+        <li>Improve lighting - noise in dark images makes landmarks jitter.</li>
+        <li>Lower <b>Cursor speed</b>: a larger active area means each pixel of jitter moves the cursor less.</li></ul></div></details>
+      <details><summary>Accidental clicks</summary><div><ul>
+        <li>Lower the <b>Pinch threshold</b> (fingers must be closer) and raise <b>Detection time</b> for clicks.</li>
+        <li>Keep thumb and index apart when just pointing. A fist never clicks.</li>
+        <li>Raise the click <b>Cooldown</b>.</li></ul></div></details>
+      <details><summary>Double-click detection problems</summary><div><ul>
+        <li>Raise <b>Max time between pinches</b> (e.g. to 450 ms) and open the pinch fully between taps.</li>
+        <li>If single clicks feel delayed, that is the double-click window; disable Double click for instant single clicks.</li></ul></div></details>
+      <details><summary>Scrolling too fast (or too slow)</summary><div><ul>
+        <li>Adjust <b>Scroll speed</b> for vertical and horizontal scrolling separately.</li>
+        <li>Try the other <b>Scroll style</b> (touchpad vs. joystick).</li></ul></div></details>
+      <details><summary>Window movement not working</summary><div><ul>
+        <li>Click the window first: by default the <i>active</i> window moves. Or set “Window to move” to “Window under the cursor”.</li>
+        <li>Windows that run as administrator (Task Manager, installers) ignore non-admin apps. Run Hand Gesture Mouse as administrator if you need to control them.</li>
+        <li>Make sure the pinky is folded - four fingers is the swipe gesture. Check the Activity log for the exact error.</li></ul></div></details>
+      <details><summary>Camera permission problems</summary><div><ul>
+        <li>Windows Settings → Privacy &amp; security → Camera: turn on <b>Camera access</b> and <b>Let desktop apps access your camera</b>.</li>
+        <li>Some laptops have a camera privacy shutter or a function key that disables the camera.</li></ul></div></details>
+      <details><summary>Application not responding</summary><div><ul>
+        <li>Press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd> to stop gesture control, then use your normal mouse.</li>
+        <li>Lower the camera resolution to 640 × 480 and <b>Max tracking FPS</b> to 20 on slow computers.</li>
+        <li>Run <code>python main.py --self-test</code> (or <code>HandGestureMouse.exe --self-test</code>) for a diagnostics report.</li>
+        <li>Check <code>logs/app.log</code> (Settings → Open log folder) and report the error.</li>
+        <li>Only one copy can run at a time - look for the tray icon.</li></ul></div></details>
+    </section>
+
+    <!-- =========================================================== FAQ -->
+    <section id="faq">
+      <div class="eyebrow">FAQ</div>
+      <h2>Frequently asked questions</h2>
+      <details><summary>Does this work without a mouse?</summary><div>Yes. Moving, clicking, double-clicking, right-clicking,
+        dragging, scrolling and window management all work by gesture. Keep a keyboard nearby for typing and for the safety hotkeys.</div></details>
+      <details><summary>Does this work with a laptop webcam?</summary><div>Yes. A built-in 720p webcam is plenty; tracking uses 640 × 480 by default.</div></details>
+      <details><summary>Can I use an external webcam?</summary><div>Yes. Pick it on the Camera page (Scan for cameras). If it already mirrors the image, turn off <b>Mirror image</b>.</div></details>
+      <details><summary>Can I control files and folders?</summary><div>Yes - double pinch opens them, pinch-and-move drags them between folders, thumb + middle pinch opens their context menu.</div></details>
+      <details><summary>Can I move application windows?</summary><div>Yes, with the three-finger gesture, and maximize, minimize, restore or snap them with four-finger swipes.</div></details>
+      <details><summary>Can I use it with multiple monitors?</summary><div>Yes. By default the active area maps onto the whole virtual desktop (all monitors). You can restrict it to the primary or any single monitor on the Cursor page.</div></details>
+      <details><summary>Can I customize gestures?</summary><div>Yes: enable/disable each gesture, change thresholds, hold durations, cooldowns, scroll style, the window-move gesture and every window-command mapping.</div></details>
+      <details><summary>Does it work offline?</summary><div>Yes. All processing happens on your computer.</div></details>
+      <details><summary>Can I use it without an internet connection?</summary><div>Yes. An internet connection is only needed to download the program; nothing is ever uploaded.</div></details>
+      <details><summary>Is my video recorded?</summary><div>No. Frames are processed in memory and discarded. Nothing is saved or sent anywhere.</div></details>
+    </section>
+
+    <!-- =========================================================== LIMITATIONS -->
+    <section id="limitations">
+      <div class="eyebrow">Honest notes</div>
+      <h2>Platform support &amp; known limitations</h2>
+      <div class="table-wrap"><table>
+        <tr><th>Feature</th><th>Windows 10 / 11</th><th>macOS / Linux</th></tr>
+        <tr><td>Hand tracking, preview, GUI</td><td>✔</td><td>✔ (runs from source)</td></tr>
+        <tr><td>Cursor, clicks, drag, scroll</td><td>✔ native SendInput (multi-monitor, smooth wheel)</td><td>✔ via PyAutoGUI (whole-notch scrolling)</td></tr>
+        <tr><td>Window move / minimize / maximize / close / snap</td><td>✔</td><td>✖ not implemented - reported as unsupported in the activity log</td></tr>
+        <tr><td>Start with operating system</td><td>✔ (current user)</td><td>✖</td></tr>
+        <tr><td>Global safety hotkeys</td><td>✔</td><td>✔ (macOS needs Accessibility permission)</td></tr>
+      </table></div>
+      <ul class="muted" style="margin-top:14px">
+        <li>Windows blocks input into apps running as administrator and into the UAC / lock screen unless this app is also elevated.</li>
+        <li>Some games using raw input, and some remote-desktop windows, ignore synthetic mouse input.</li>
+        <li>Horizontal scrolling only works in apps that support horizontal wheel messages.</li>
+        <li>Recognition quality depends on lighting and camera quality; very dark rooms reduce accuracy.</li>
+      </ul>
+      <footer>Hand Gesture Mouse · user guide · <span id="year"></span> · Hand tracking by Google MediaPipe.</footer>
+    </section>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Screenshot"><img alt=""></div>
+<a href="#welcome" class="icon-btn to-top" id="to-top" aria-label="Back to top">↑</a>
+<script src="js/gesture-demo.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

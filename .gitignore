@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/work/
+logs/
+*.corrupt.json
+*.tmp
+.pytest_cache/

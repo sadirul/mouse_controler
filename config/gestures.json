@@ -1,0 +1,95 @@
+{
+  "gestures": {
+    "move": {
+      "enabled": true,
+      "min_ms": 40
+    },
+    "click": {
+      "enabled": true,
+      "min_ms": 40,
+      "cooldown_ms": 120,
+      "pinch_threshold": 0.28,
+      "release_threshold": 0.38
+    },
+    "double_click": {
+      "enabled": true,
+      "interval_ms": 350
+    },
+    "right_click": {
+      "enabled": true,
+      "min_ms": 80,
+      "cooldown_ms": 400,
+      "pinch_threshold": 0.28
+    },
+    "long_press": {
+      "enabled": true,
+      "duration_ms": 800,
+      "mode": "hold"
+    },
+    "drag": {
+      "enabled": true,
+      "on_move": true,
+      "move_threshold": 0.025
+    },
+    "scroll": {
+      "enabled": true,
+      "min_ms": 120,
+      "mode": "touchpad",
+      "require_together": true,
+      "together_threshold": 0.45,
+      "axis_lock_threshold": 0.015,
+      "dead_zone": 0.003
+    },
+    "scroll_vertical": {
+      "enabled": true,
+      "speed": 30.0
+    },
+    "scroll_horizontal": {
+      "enabled": true,
+      "speed": 30.0
+    },
+    "window_move": {
+      "enabled": true,
+      "min_ms": 250,
+      "pose": "index_middle_ring",
+      "mode": "direct",
+      "target": "active",
+      "gain": 1.0
+    },
+    "window_swipe": {
+      "enabled": true,
+      "min_ms": 80,
+      "distance": 0.9,
+      "window_ms": 650,
+      "cooldown_ms": 900
+    },
+    "horns": {
+      "enabled": true,
+      "hold_ms": 600,
+      "cooldown_ms": 1200
+    },
+    "thumb_pinky": {
+      "enabled": true,
+      "hold_ms": 700,
+      "cooldown_ms": 300,
+      "pinch_threshold": 0.32
+    },
+    "close_confirm": {
+      "mode": "gesture",
+      "window_ms": 4000
+    },
+    "emergency_stop": {
+      "enabled": true,
+      "hold_ms": 1500,
+      "require_palm_facing": false
+    },
+    "mappings": {
+      "four_swipe_up": "maximize",
+      "four_swipe_down": "restore_or_minimize",
+      "four_swipe_left": "snap_left",
+      "four_swipe_right": "snap_right",
+      "horns_hold": "switch_app",
+      "thumb_pinky_hold": "close"
+    }
+  }
+}
