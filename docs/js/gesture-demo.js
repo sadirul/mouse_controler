@@ -196,6 +196,53 @@
       scene: screen(win(26, 18, 150, 90, "Any app") + '<g class="em-cursor" style="transform:translate(150px,80px)">' + CURSOR + "</g>" +
         '<g class="em-badge"><rect x="62" y="56" width="116" height="34" rx="17" class="scr-stop"/>' +
         '<text x="120" y="77.5" class="scr-text stop" text-anchor="middle">CONTROL STOPPED</text></g>', "All gesture control stops")
+    },
+    screenshot: {
+      dur: 4,
+      pair: true,
+      hand: { straight: { index: -6 }, curled: ["middle", "ring", "pinky"], thumb: [-78, 1, false], active: ["index", "thumb"],
+        label: "Both hands make an L shape, framing the screen" },
+      scene: screen(win(26, 18, 150, 90, "Photos") + '<rect x="40" y="40" width="54" height="40" rx="4" class="scr-card c1"/>' +
+        '<rect x="102" y="40" width="54" height="40" rx="4" class="scr-card c0"/>' +
+        '<g class="shot-frame"><path d="M10 30 V10 H30 M210 10 H230 V30 M230 116 V136 H210 M30 136 H10 V116" class="shot-corners"/></g>' +
+        '<rect width="240" height="146" class="shot-flash"/>' +
+        '<g class="shot-saved"><rect x="150" y="104" width="82" height="36" rx="5" class="scr-menu"/>' +
+        '<rect x="156" y="110" width="30" height="24" rx="3" class="scr-card c1"/>' +
+        '<text x="191" y="121" class="scr-text small">Screenshot</text><text x="191" y="130" class="scr-text small">saved</text></g>',
+        "The whole screen is saved as a picture")
+    },
+    "palm-slide": {
+      dur: 5,
+      hand: { straight: { index: -6, middle: -1, ring: 4, pinky: 10 }, thumb: [-42, 1, false], active: ["thumb", "index", "middle", "ring", "pinky"],
+        label: "Open hand sliding right, then left" },
+      scene: screen('<g class="flip-b">' + win(60, 30, 130, 92, "Music") + lines(70, 54, 4, 100) + "</g>" +
+        '<g class="flip-a">' + win(50, 22, 130, 92, "Mail") + lines(60, 46, 5, 100) + "</g>" +
+        '', "Apps flip like cards")
+    },
+    "cross-x": {
+      dur: 3.6,
+      pair: true,
+      hand: { straight: { index: -6 }, curled: ["middle", "ring", "pinky"], active: ["index"], label: "Both index fingers crossed like an X" },
+      scene: screen('<g class="lock-desk">' + win(30, 22, 150, 90, "Any app") + lines(40, 46, 4, 110) + "</g>" +
+        '<g class="lock-screen"><rect width="240" height="160" rx="10" class="lock-bg"/>' +
+        '<text x="120" y="62" class="lock-time" text-anchor="middle">12:30</text>' +
+        '<circle cx="120" cy="92" r="11" class="lock-avatar"/>' +
+        '<rect x="113" y="112" width="14" height="11" rx="2" class="lock-pad"/><path d="M116 112 v-4 a4 4 0 0 1 8 0 v4" class="lock-shackle"/></g>',
+        "Windows locks")
+    },
+    "recycle-bin": {
+      dur: 6,
+      hand: { straight: { index: -8, pinky: 12 }, curled: ["middle", "ring"], active: ["index", "pinky"], label: "Mapped gesture (horns) held to empty the Recycle Bin",
+        extra: '<g class="hold-ring-wrap">' + ring(176, 40, 20, "hold-ring") + "</g>" },
+      scene: screen('<g transform="translate(26 30)"><path d="M0 6 H34 L31 46 H3 Z" class="scr-folder"/><rect x="-3" y="0" width="40" height="6" rx="2" class="scr-folder"/>' +
+        '<g class="bin-trash"><rect x="5" y="-10" width="10" height="13" rx="1" class="scr-file"/><rect x="17" y="-7" width="11" height="10" rx="1" class="scr-file"/></g>' +
+        '<text x="17" y="58" class="scr-text small" text-anchor="middle">Recycle Bin</text></g>' +
+        '<g class="bin-dialog"><rect x="70" y="40" width="150" height="70" rx="6" class="scr-menu"/>' +
+        '<text x="80" y="56" class="scr-text">Empty Recycle Bin?</text>' +
+        '<text x="80" y="69" class="scr-text" style="font-size:6px;font-weight:400">11 items will be deleted permanently</text>' +
+        '<rect x="128" y="84" width="40" height="16" rx="8" class="scr-button bin-yes"/><text x="148" y="95" class="scr-text" text-anchor="middle">Yes</text>' +
+        '<rect x="172" y="84" width="40" height="16" rx="8" class="scr-button"/><text x="192" y="95" class="scr-text" text-anchor="middle">No</text></g>' +
+        '<g class="bin-cursor" style="transform:translate(160px,93px)">' + CURSOR + "</g>", "Recycle Bin emptied after confirming")
     }
   };
 
@@ -207,7 +254,8 @@
     el.style.setProperty("--dur", demo.dur + "s");
     el.innerHTML =
       '<div class="demo-stage">' +
-      '<div class="demo-hand">' + buildHand(demo.hand) + "</div>" +
+      '<div class="demo-hand' + (demo.pair ? " pair" : "") + '">' + buildHand(demo.hand) +
+      (demo.pair ? '<div class="mirror">' + buildHand(demo.hand) + "</div>" : "") + "</div>" +
       '<div class="demo-arrow" aria-hidden="true">&rarr;</div>' +
       '<div class="demo-screen">' + demo.scene + "</div>" +
       "</div>" +

@@ -113,6 +113,7 @@ class TrackingWorker(QThread):
             last_status = 0.0
             last_screen_check = time.monotonic()
             last_preview = 0.0
+            controlling: str | None = None  # handedness of the hand currently in control
             while self._running:
                 loop_start = time.monotonic()
                 self._drain_commands(controller)
@@ -154,9 +155,17 @@ class TrackingWorker(QThread):
                 h, w = frame.shape[:2]
                 mirrored = bool(cfg["camera"]["mirror"])
                 hands = tracker.process(frame, mirrored=mirrored)
-                hand = select_hand(hands, cfg["tracking"]["preferred_hand"], cfg["tracking"]["min_hand_score"])
+                hand = select_hand(hands, cfg["tracking"]["preferred_hand"], cfg["tracking"]["min_hand_score"],
+                                   previous=controlling)
                 now = time.monotonic()
-                result = controller.process(hand, now, aspect=w / h, mirrored=mirrored)
+                if hand is not None:
+                    if controlling is not None and hand.handedness != controlling:
+                        controller.switch_hand()
+                        self.activity.add("Tracking", f"Control switched to {hand.handedness.lower()} hand")
+                    controlling = hand.handedness
+                min_score = cfg["tracking"]["min_hand_score"]
+                others = [h_ for h_ in hands if h_ is not hand and h_.score >= min_score]
+                result = controller.process(hand, now, aspect=w / h, mirrored=mirrored, others=others)
 
                 frame_times.append(now)
                 frame_times = [t for t in frame_times if now - t <= 1.0]
@@ -166,11 +175,11 @@ class TrackingWorker(QThread):
                     last_preview = now
                     d = result.decision
                     label = d.label if not controller.paused else "Paused"
-                    others = [h_.landmarks for h_ in hands if h_ is not hand]
+                    other_landmarks = [h_.landmarks for h_ in hands if h_ is not hand]
                     draw_overlay(
                         frame, hand.landmarks if hand else None, d.state, label,
                         hand.score if hand else None, controller.cursor.effective_region(),
-                        d.progress, d.progress_label, controller.paused, others,
+                        d.progress, d.progress_label, controller.paused, other_landmarks,
                     )
                     image = QImage(frame.data, w, h, frame.strides[0], QImage.Format.Format_BGR888).copy()
                     self.frame_ready.emit(image)
@@ -269,7 +278,7 @@ class TrackingWorker(QThread):
             "fps": fps,
             "hand_detected": hand is not None,
             "hand": hand_text,
-            "controlling_hand": cfg["tracking"]["preferred_hand"].capitalize(),
+            "controlling_hand": {"right": "Right", "left": "Left"}.get(cfg["tracking"]["preferred_hand"], "Either"),
             "pose": pose_label(result.pose),
             "gesture": d.label,
             "mode": STATE_MODES.get(d.state, d.state.value) if not controller.paused else "Paused",

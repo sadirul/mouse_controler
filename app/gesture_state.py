@@ -10,6 +10,7 @@ pose is released, and the emergency-stop palm is checked before everything else.
 """
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -50,6 +51,7 @@ class Ev:
     CLOSE_ARMED = "close_armed"
     CLOSE_CANCELLED = "close_cancelled"
     EMERGENCY_STOP = "emergency_stop"
+    RESUME = "resume"  # resume gesture held during an emergency stop
 
 
 @dataclass
@@ -114,6 +116,9 @@ class GestureStateMachine:
         self._last_tap_t = -1e9
         self._last_fire: dict[str, float] = {}
         self._palm_since: float | None = None
+        self._resume_since: float | None = None
+        self._slide_samples: deque[tuple[float, np.ndarray]] = deque()
+        self._slide_last: tuple[float, str] | None = None  # (time, direction) of the last slide
         self._scroll_origin: np.ndarray | None = None
         self._scroll_ref: np.ndarray | None = None
         self._scroll_smooth: np.ndarray | None = None
@@ -180,7 +185,8 @@ class GestureStateMachine:
             d.anchor = features.anchor
 
         if self.state == State.STOPPED:
-            d.label = "Emergency stop"
+            self._resume_check(pose, t, d)
+            d.state = self.state
             return d
 
         events = d.events
@@ -246,6 +252,30 @@ class GestureStateMachine:
         d.progress = progress
         d.progress_label = "Emergency stop"
         return False
+
+    def _resume_pose(self) -> Pose:
+        return Pose.HORNS if self._g("resume", "pose", "fist") == "horns" else Pose.FIST
+
+    def _resume_check(self, pose: Pose, t: float, d: Decision) -> None:
+        """While stopped: holding the resume pose long enough turns gesture control back on."""
+        d.label = "Emergency stop"
+        if not self._enabled("resume") or pose != self._resume_pose():
+            self._resume_since = None
+            return
+        if self._resume_since is None:
+            self._resume_since = t
+        hold = float(self._g("resume", "hold_ms", 2000)) / 1000.0
+        progress = (t - self._resume_since) / hold
+        if progress < 1.0:
+            d.progress = progress
+            d.progress_label = "Resume"
+            return
+        self.reset()
+        d.events.append(Event(Ev.RESUME))
+        # Wait until the resume pose is released so it cannot trigger its normal action
+        # (e.g. horns -> switch app) straight away.
+        self._wait(pose, d, "Resumed - release to continue")
+        d.progress = 1.0
 
     def _step(self, pose: Pose, f: HandFeatures | None, t: float, d: Decision) -> None:
         handler = {
@@ -347,6 +377,11 @@ class GestureStateMachine:
                     self._wait(pose, d, "Cooldown")
                 return
 
+        if pose == Pose.OPEN_PALM and self._enabled("palm_slide"):
+            self._slide_check(f, t, d)
+        else:
+            self._slide_samples.clear()
+
         if pose == Pose.POINT and self._enabled("move"):
             self.state = State.POINTING
             if self._pending_click_t is not None:
@@ -369,6 +404,38 @@ class GestureStateMachine:
 
         self.state = State.IDLE
         d.label = {Pose.FIST: "Fist (paused cursor)", Pose.OPEN_PALM: "Open palm", Pose.RELAXED: "Relaxed"}.get(pose, "Idle")
+
+    def _slide_check(self, f: HandFeatures, t: float, d: Decision) -> None:
+        """Open hand slid quickly sideways -> flip to the next / previous app.
+
+        The hand naturally swings back after a slide; that return stroke (opposite direction shortly
+        after) is ignored so one slide never flips twice.
+        """
+        window = float(self._g("palm_slide", "window_ms", 400)) / 1000.0
+        samples = self._slide_samples
+        samples.append((t, f.palm_center.copy()))
+        while samples and t - samples[0][0] > window:
+            samples.popleft()
+        delta = f.palm_center - samples[0][1]
+        dx = delta[0] * f.aspect / f.hand_size
+        dy = delta[1] / f.hand_size
+        if abs(dx) < float(self._g("palm_slide", "distance", 1.2)) or abs(dx) < 2.0 * abs(dy):
+            return
+        direction = "right" if dx > 0 else "left"
+        samples.clear()
+        if self._slide_last is not None:
+            last_t, last_dir = self._slide_last
+            elapsed = (t - last_t) * 1000.0
+            if elapsed < float(self._g("palm_slide", "cooldown_ms", 500)):
+                return
+            if last_dir != direction and elapsed < float(self._g("palm_slide", "return_ms", 900)):
+                return  # the hand swinging back after the previous slide
+        self._slide_last = (t, direction)
+        self._palm_since = t  # sliding is not holding still: restart the emergency-stop timer
+        d.progress = 0.0
+        d.progress_label = ""
+        self._flush_pending_click(d.events, t)
+        self._trigger(f"palm_slide_{direction}", t, d)
 
     def _wait(self, pose: Pose, d: Decision, label: str) -> None:
         self.state = State.WAIT_RELEASE
@@ -568,6 +635,11 @@ class GestureStateMachine:
             self._fire(section, t)
             self._trigger(trigger, t, d)
             self._wait(pose, d, d.label)
+
+    def trigger(self, trigger: str, t: float, d: Decision) -> None:
+        """Run a mapped trigger detected outside the state machine (two-hand gestures)."""
+        self._flush_pending_click(d.events, t)
+        self._trigger(trigger, t, d)
 
     def _trigger(self, trigger: str, t: float, d: Decision) -> None:
         action = self.cfg.get("mappings", {}).get(trigger, "none")

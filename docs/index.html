@@ -40,7 +40,11 @@
     <a class="sub" href="#g-swipe">Window swipes</a>
     <a class="sub" href="#g-horns">Switch application</a>
     <a class="sub" href="#g-close">Close a window</a>
-    <a class="sub" href="#g-stop">Emergency stop</a>
+    <a class="sub" href="#g-stop">Emergency stop &amp; resume</a>
+    <a class="sub" href="#g-screenshot">Screenshot</a>
+    <a class="sub" href="#g-bin">Empty Recycle Bin</a>
+    <a class="sub" href="#g-slide">Flip between apps</a>
+    <a class="sub" href="#g-cross">Lock Windows (X)</a>
     <a href="#reference">Gesture reference table</a>
     <div class="group">Reference</div>
     <a href="#app-guide">The application</a>
@@ -71,8 +75,9 @@
 
       <div class="grid cols-3" style="margin-top:22px">
         <div class="card"><h3>What it does</h3><p class="muted">Controls the real system cursor, clicks, double-clicks,
-          right-clicks, long-presses, drag &amp; drop, vertical and horizontal scrolling, and window management
-          (move, minimize, maximize, restore, snap, switch, close).</p></div>
+          right-clicks, long-presses, drag &amp; drop, vertical and horizontal scrolling, window management
+          (move, minimize, maximize, restore, snap, switch, close), two-hand screenshots, emptying the
+          Recycle Bin, flipping between apps with a slide and locking Windows with crossed fingers. Works with your left or right hand.</p></div>
         <div class="card"><h3>Built for safety</h3><p class="muted">An open palm stops everything instantly. Pause from the
           dashboard, the tray or a global hotkey. Closing a window always needs confirmation, and system windows are
           protected.</p></div>
@@ -88,7 +93,10 @@
         <a class="chip" href="#g-vscroll">Two fingers → scroll</a><a class="chip" href="#g-hscroll">Two fingers sideways → horizontal scroll</a>
         <a class="chip" href="#g-window">Three fingers → move window</a><a class="chip" href="#g-swipe">Four-finger swipes → window commands</a>
         <a class="chip" href="#g-horns">Horns → switch app</a><a class="chip" href="#g-close">Thumb + pinky → close (confirmed)</a>
-        <a class="chip" href="#g-stop">Open palm → emergency stop</a>
+        <a class="chip" href="#g-stop">Open palm → emergency stop</a><a class="chip" href="#g-stop">Fist hold → resume</a>
+        <a class="chip" href="#g-screenshot">Two-hand frame → screenshot</a><a class="chip" href="#g-bin">Mapped gesture → empty Recycle Bin (confirmed)</a>
+<a class="chip" href="#g-slide">Open-hand slide → next / previous app</a>
+        <a class="chip" href="#g-cross">Crossed index fingers (X) → lock Windows</a>
       </p>
     </section>
 
@@ -410,17 +418,93 @@
 
       <article class="gesture" id="g-stop">
         <div>
-          <h3><span class="num">13</span> Emergency stop <span class="badge">Open palm, 1.5 s</span></h3>
+          <h3><span class="num">13</span> Emergency stop &amp; resume <span class="badge">Open palm 1.5 s · fist 2 s</span></h3>
           <div class="label">Steps</div>
           <ol><li>Show your open palm, all five fingers spread, to the camera.</li><li>Hold for 1.5 seconds - the red ring fills.</li></ol>
           <div class="label">Computer action</div><span class="action">Releases any held button and disables all gesture actions</span>
           <div class="label">Resuming</div>
-          <ul class="tips"><li>Click <b>Resume control</b> on the dashboard or in the tray menu, or press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd>.</li>
-            <li>Gestures can never resume control - only you can.</li></ul>
+          <ul class="tips"><li><b>By gesture:</b> make a fist and hold it for 2 s - a ring fills, then control comes back.
+              Open your hand afterwards to continue (the resume pose never triggers its normal action).</li>
+            <li>Or click <b>Resume control</b> on the dashboard or in the tray menu, or press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd>.</li>
+            <li>Gestures → <b>Resume after emergency stop</b>: turn the gesture off, use Horns instead of a fist, or change the hold time.</li></ul>
           <div class="label">Tip</div>
           <ul class="tips"><li>A brief open palm is harmless: it is also the natural “resting” pose and does nothing.</li></ul>
         </div>
         <div data-demo="emergency"></div>
+      </article>
+
+      <article class="gesture" id="g-screenshot">
+        <div>
+          <h3><span class="num">14</span> Take a screenshot <span class="badge">Two hands, L-frame</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Make an L with <b>each</b> hand: thumb and index finger out, the other three fingers folded.</li>
+            <li>Hold both hands up together, as if framing a photo, for 0.8 s - the “Screenshot” ring fills.</li>
+            <li>Lower your hands before taking the next one.</li></ol>
+          <div class="label">Computer action</div><span class="action">Saves the whole screen (all monitors) as a PNG in Pictures\Screenshots</span>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>The cursor stays still while you hold the frame, so the screenshot shows exactly what you see.</li>
+            <li>One L hand alone is just the normal pointer - both hands are needed.</li>
+            <li>A notice shows where the file was saved; it is also listed in Activity logs.</li>
+            <li>Gestures → <b>Screenshot (two-hand frame)</b>: hold time, cooldown (2 s) or turn it off.
+              To save elsewhere set <code>"folder"</code> under <code>"screenshot"</code> in <code>gestures.json</code>.</li></ul>
+        </div>
+        <div data-demo="screenshot"></div>
+      </article>
+
+      <article class="gesture" id="g-bin">
+        <div>
+          <h3><span class="num">15</span> Empty the Recycle Bin <span class="badge">Any mapped gesture</span></h3>
+          <div class="label">Set up (once)</div>
+          <ol><li>Open <b>Gestures</b> and pick a gesture slot: Horns hold, Thumb + pinky hold or a four-finger swipe.</li>
+            <li>Set its action to <b>Empty Recycle Bin (asks to confirm)</b>.</li></ol>
+          <div class="label">Steps</div>
+          <ol><li>Do the gesture - a dialog shows how many items and how much space will be freed.</li>
+            <li>Pinch on <b>Yes</b> to delete permanently, or <b>No</b> to cancel.</li></ol>
+          <div class="label">Computer action</div><span class="action">Permanently deletes everything in the Recycle Bin (all drives)</span>
+          <div class="label">Safety</div>
+          <ul class="tips"><li>Always confirmed in a dialog, whichever gesture triggers it; <b>No</b> is the default button.</li>
+            <li>If the bin is already empty you just get a short notice - no dialog.</li>
+            <li>Also available without gestures: tray icon → <b>Empty Recycle Bin...</b></li></ul>
+        </div>
+        <div data-demo="recycle-bin"></div>
+      </article>
+
+      <article class="gesture" id="g-slide">
+        <div>
+          <h3><span class="num">16</span> Flip between apps <span class="badge">Open-hand slide</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Open your hand, all fingers spread.</li>
+            <li>Slide it quickly to the <b>right</b> (about one and a half hand-widths in under half a second) - the next app comes to the front.</li>
+            <li>Slide again to keep flipping. Slide to the <b>left</b> to go back to the previous app.</li></ol>
+          <div class="label">Computer action (default)</div><span class="action">Right: next app · Left: previous app</span>
+          <div class="label">How it differs from Alt+Tab</div>
+          <ul class="tips"><li>Apps flip like a stack of cards: the current app goes to the back and the one behind it comes forward,
+              so right, right, left, left brings you back where you started. Alt+Tab only toggles between two apps.</li>
+            <li>Minimized apps are restored when you flip to them.</li></ul>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Your hand naturally swings back after a slide; that swing is ignored for 0.9 s so one slide never flips twice.</li>
+            <li>Sliding does not count as holding a still palm, so flipping never triggers the emergency stop. A still open palm for 1.5 s still does.</li>
+            <li>Gestures → <b>Flip between apps</b>: slide distance and speed, the swing-back time, remap either direction, or turn it off.</li></ul>
+        </div>
+        <div data-demo="palm-slide"></div>
+      </article>
+
+      <article class="gesture" id="g-cross">
+        <div>
+          <h3><span class="num">17</span> Lock Windows with an X <span class="badge">Crossed index fingers</span></h3>
+          <div class="label">Steps</div>
+          <ol><li>Point with both index fingers (other fingers folded; thumbs may stay out).</li>
+            <li>Cross them in front of the camera like an <b>X</b> - a clear angle, not just touching side by side.</li>
+            <li>Hold for half a second.</li></ol>
+          <div class="label">Computer action (default)</div><span class="action">Locks Windows - same as <kbd>Win</kbd>+<kbd>L</kbd></span>
+          <div class="label">Tips</div>
+          <ul class="tips"><li>Keep both fingers visible where they cross; if one hand hides the other, cross them a little higher.</li>
+            <li>It fires once per X - uncross your fingers before using it again (3 s cooldown).</li>
+            <li>An X is never taken as the two-hand screenshot frame, even with thumbs out.</li>
+            <li>Gestures → <b>Cross fingers (X)</b>: hold time, cooldown, another action, or turn it off.</li>
+            <li>Laptop with face sign-in? Windows may unlock again as soon as it sees you. Turn off <i>Settings → Accounts → Sign-in options → Facial recognition → Automatically dismiss the lock screen if Windows recognizes your face</i>.</li></ul>
+        </div>
+        <div data-demo="cross-x"></div>
       </article>
     </section>
 
@@ -444,6 +528,11 @@
         <tr><td><img class="thumb" src="assets/gestures/thumb_pinky.svg" alt=""></td><td>Thumb + pinky pinch</td><td>Hold 0.7 s, then repeat</td><td>Close window (confirmed)</td></tr>
         <tr><td><img class="thumb" src="assets/gestures/fist.svg" alt=""></td><td>Fist</td><td>Close the hand</td><td>Freeze cursor (reposition hand)</td></tr>
         <tr><td><img class="thumb" src="assets/gestures/emergency_stop.svg" alt=""></td><td>Open palm</td><td>Hold for 1.5 seconds</td><td>Emergency stop</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/resume.svg" alt=""></td><td>Fist (while stopped)</td><td>Hold for 2 seconds</td><td>Resume after emergency stop</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/screenshot.svg" alt=""></td><td>Two-hand L-frame</td><td>Hold both hands 0.8 s</td><td>Screenshot (PNG in Pictures\Screenshots)</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/recycle_bin.svg" alt=""></td><td>Any mapped gesture</td><td>Map it, then do it</td><td>Empty Recycle Bin (always confirmed)</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/palm_slide.svg" alt=""></td><td>Open-hand slide</td><td>Slide quickly right / left</td><td>Next app / previous app</td></tr>
+        <tr><td><img class="thumb" src="assets/gestures/cross_x.svg" alt=""></td><td>Crossed index fingers (X)</td><td>Two hands, hold 0.5 s</td><td>Lock Windows (Win+L)</td></tr>
       </table></div>
       <p class="muted" style="margin-top:12px">Keyboard safety shortcuts (work even when the window is hidden):
         <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd> pause / resume · <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd> emergency stop ·
@@ -492,9 +581,13 @@
         <tr><td>Scroll speed</td><td>Gestures → scroll</td><td>30</td><td>Wheel notches per frame-height of finger travel.</td></tr>
         <tr><td>Cooldowns</td><td>Gestures</td><td>120-1200 ms</td><td>Minimum time before the same gesture can fire again.</td></tr>
         <tr><td>Tracking FPS</td><td>Camera</td><td>30</td><td>Lower it to save CPU on slow machines.</td></tr>
-        <tr><td>Controlling hand</td><td>Camera</td><td>Right</td><td>Right, left or either. The other hand is ignored.</td></tr>
+        <tr><td>Controlling hand</td><td>Camera</td><td>Either</td><td>Either hand, right only or left only. With “Either”, the hand already in control keeps it while both are visible.</td></tr>
         <tr><td>Emergency stop hold</td><td>Gestures → Emergency stop</td><td>1500 ms</td><td>How long the palm must be held.</td></tr>
-        <tr><td>Window command mappings</td><td>Gestures → swipes / horns / thumb + pinky</td><td>see table</td><td>Assign minimize, maximize, restore, close, switch app, snap left/right, move to top.</td></tr>
+        <tr><td>Resume gesture</td><td>Gestures → Resume after emergency stop</td><td>Fist, 2000 ms</td><td>On/off, fist or horns, hold time.</td></tr>
+        <tr><td>Screenshot</td><td>Gestures → Screenshot (two-hand frame)</td><td>800 ms, 2 s cooldown</td><td>On/off, hold time, cooldown; save folder in <code>gestures.json</code>.</td></tr>
+        <tr><td>Cross fingers (X)</td><td>Gestures → Cross fingers (X)</td><td>500 ms, 3 s cooldown</td><td>Hold time and action (default: lock Windows).</td></tr>
+        <tr><td>Flip between apps</td><td>Gestures → Flip between apps</td><td>1.2 hand in 400 ms, swing-back 900 ms</td><td>Lower the distance if slides are missed; raise the swing-back time if apps flip back by themselves.</td></tr>
+        <tr><td>Window command mappings</td><td>Gestures → swipes / horns / thumb + pinky / slides / X</td><td>see table</td><td>Assign minimize, maximize, restore, close, switch app, snap left/right, move to top, empty Recycle Bin, lock Windows, next or previous app.</td></tr>
       </table></div>
     </section>
 
@@ -505,10 +598,12 @@
       <div class="grid cols-2">
         <div class="card"><h3>Stop, pause and resume</h3><ul class="muted">
           <li>Open palm for 1.5 s, the red button, the tray menu or <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd> stop everything immediately and release held buttons.</li>
+          <li>Resume with a 2 s fist hold, the Resume button, the tray menu or <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> (the gesture can be turned off).</li>
           <li>Pause (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd>) keeps the preview running but performs no actions.</li>
           <li>Losing sight of your hand for 0.25 s ends any drag or window move.</li></ul></div>
         <div class="card"><h3>No accidental damage</h3><ul class="muted">
           <li>Closing a window needs a second gesture or a dialog; the desktop, taskbar and this app can't be closed.</li>
+          <li>Emptying the Recycle Bin always asks in a dialog first (default answer: No).</li>
           <li>Gestures only trigger the fixed mouse/window actions listed here - never commands, scripts or typing.</li>
           <li>Debouncing, hysteresis and cooldowns prevent duplicate clicks; tracking starts only when you press Start.</li></ul></div>
       </div>
@@ -529,7 +624,7 @@
       <details><summary>Fingers not detected</summary><div><ul>
         <li>Light your hand from the front; avoid a bright window behind you.</li>
         <li>Keep the whole hand in view, 40-80 cm from the camera, palm or back facing the camera.</li>
-        <li>Check <b>Controlling hand</b>: with “Right hand” selected your left hand is ignored. Choose “Either hand” to test.</li>
+        <li>Check <b>Controlling hand</b>: with “Right hand” or “Left hand” selected the other hand is ignored. “Either hand” (the default) accepts both.</li>
         <li>Lower <b>Detection confidence</b> on the Camera page.</li></ul></div></details>
       <details><summary>Cursor shaking</summary><div><ul>
         <li>Increase <b>Smoothing</b> and the <b>Dead zone</b> on the Cursor page.</li>
@@ -572,6 +667,9 @@
       <details><summary>Can I move application windows?</summary><div>Yes, with the three-finger gesture, and maximize, minimize, restore or snap them with four-finger swipes.</div></details>
       <details><summary>Can I use it with multiple monitors?</summary><div>Yes. By default the active area maps onto the whole virtual desktop (all monitors). You can restrict it to the primary or any single monitor on the Cursor page.</div></details>
       <details><summary>Can I customize gestures?</summary><div>Yes: enable/disable each gesture, change thresholds, hold durations, cooldowns, scroll style, the window-move gesture and every window-command mapping.</div></details>
+      <details><summary>Can I use my left hand?</summary><div>Yes. By default either hand works. If both hands are visible, the one already moving the cursor keeps control; the other takes over when the first leaves the view.</div></details>
+      <details><summary>Where are my screenshots saved?</summary><div>In <code>Pictures\Screenshots</code> as <code>Screenshot_YYYY-MM-DD_HH-MM-SS.png</code>. The dashboard notice and Activity logs show the full path.</div></details>
+      <details><summary>Can a gesture delete my files?</summary><div>Only the Recycle Bin action deletes anything. It is not on any gesture unless you map it, and it always asks for confirmation first.</div></details>
       <details><summary>Does it work offline?</summary><div>Yes. All processing happens on your computer.</div></details>
       <details><summary>Can I use it without an internet connection?</summary><div>Yes. An internet connection is only needed to download the program; nothing is ever uploaded.</div></details>
       <details><summary>Is my video recorded?</summary><div>No. Frames are processed in memory and discarded. Nothing is saved or sent anywhere.</div></details>

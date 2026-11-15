@@ -37,7 +37,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     },
     "tracking": {
         "max_fps": 30,
-        "preferred_hand": "right",  # right | left | any
+        "preferred_hand": "any",  # right | left | any
         "min_detection_confidence": 0.6,
         "min_presence_confidence": 0.5,
         "min_tracking_confidence": 0.5,
@@ -123,6 +123,14 @@ DEFAULT_GESTURES: dict[str, Any] = {
         },
         "close_confirm": {"mode": "gesture", "window_ms": 4000},  # gesture | dialog
         "emergency_stop": {"enabled": True, "hold_ms": 1500, "require_palm_facing": False},
+        "resume": {"enabled": True, "pose": "fist", "hold_ms": 2000},  # pose: fist | horns
+        # Two-hand camera frame (an L with each hand). folder "" = Pictures/Screenshots
+        "screenshot": {"enabled": True, "hold_ms": 800, "cooldown_ms": 2000, "folder": ""},
+        # Open hand slid sideways by `distance` hand sizes within `window_ms`. The opposite direction
+        # is ignored for `return_ms` afterwards (the hand swinging back).
+        # Two index fingers crossed like an X, held for hold_ms
+        "cross_x": {"enabled": True, "hold_ms": 500, "cooldown_ms": 3000},
+        "palm_slide": {"enabled": True, "distance": 1.2, "window_ms": 400, "cooldown_ms": 500, "return_ms": 900},
         "mappings": {
             "four_swipe_up": "maximize",
             "four_swipe_down": "restore_or_minimize",
@@ -130,6 +138,9 @@ DEFAULT_GESTURES: dict[str, Any] = {
             "four_swipe_right": "snap_right",
             "horns_hold": "switch_app",
             "thumb_pinky_hold": "close",
+            "palm_slide_left": "previous_app",
+            "palm_slide_right": "next_app",
+            "cross_x": "lock_screen",
         },
     }
 }
@@ -146,6 +157,10 @@ WINDOW_ACTIONS = [
     "snap_left",
     "snap_right",
     "move_top",
+    "empty_recycle_bin",  # always confirmed in a dialog
+    "lock_screen",  # same as Win+L
+    "next_app",  # carousel: current app to the back, the one behind it to the front
+    "previous_app",
 ]
 
 WINDOW_TRIGGERS = [
@@ -155,6 +170,9 @@ WINDOW_TRIGGERS = [
     "four_swipe_right",
     "horns_hold",
     "thumb_pinky_hold",
+    "palm_slide_left",
+    "palm_slide_right",
+    "cross_x",
 ]
 
 # Values that must stay inside a range regardless of what the JSON says.
@@ -180,6 +198,15 @@ _RANGES: dict[str, tuple[float, float]] = {
     "gestures.double_click.interval_ms": (100, 1000),
     "gestures.long_press.duration_ms": (200, 5000),
     "gestures.emergency_stop.hold_ms": (500, 5000),
+    "gestures.resume.hold_ms": (500, 5000),
+    "gestures.screenshot.hold_ms": (200, 5000),
+    "gestures.screenshot.cooldown_ms": (0, 10000),
+    "gestures.palm_slide.distance": (0.5, 4.0),
+    "gestures.cross_x.hold_ms": (100, 3000),
+    "gestures.cross_x.cooldown_ms": (0, 10000),
+    "gestures.palm_slide.window_ms": (150, 1000),
+    "gestures.palm_slide.cooldown_ms": (0, 5000),
+    "gestures.palm_slide.return_ms": (0, 3000),
 }
 
 FILES = {"settings": "settings.json", "gestures": "gestures.json"}

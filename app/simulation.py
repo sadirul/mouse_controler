@@ -59,6 +59,7 @@ def synth_hand(
     hand: str = "Right",
     palm_facing: bool = True,
     finger_together: bool = False,
+    tilt: float = 0.0,
 ) -> np.ndarray:
     """Return a (21, 3) array of normalised landmarks.
 
@@ -107,6 +108,12 @@ def synth_hand(
         local[:, 2] *= -1
     if hand == "Left":
         local[:, 0] *= -1
+    if tilt:
+        # rotate the whole hand in the image plane around the wrist (positive = clockwise on screen)
+        a = math.radians(tilt)
+        x, y = local[:, 0].copy(), local[:, 1].copy()
+        local[:, 0] = x * math.cos(a) - y * math.sin(a)
+        local[:, 1] = x * math.sin(a) + y * math.cos(a)
 
     out = np.zeros((21, 3))
     out[:, 0] = center[0] + local[:, 0] * size / aspect

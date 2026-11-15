@@ -21,6 +21,8 @@ from app.gesture_state import Decision, Ev, Event, GestureStateMachine, State
 from app.hand_tracker import TrackedHand
 from app.logger import ActivityLog
 from app.mouse_controller import MouseController
+from app import recycle_bin
+from app.screenshot import CrossGesture, FrameGesture, take_screenshot
 from app.scroll_controller import ScrollController
 from app.window_controller import WindowController, WindowError
 
@@ -40,6 +42,7 @@ EVENT_GESTURE = {
     Ev.CLOSE_ARMED: "Thumb + pinky hold",
     Ev.CLOSE_CANCELLED: "Close confirmation",
     Ev.EMERGENCY_STOP: "Open palm (hold)",
+    Ev.RESUME: "Resume gesture (hold)",
 }
 
 TRIGGER_GESTURE = {
@@ -49,6 +52,9 @@ TRIGGER_GESTURE = {
     "four_swipe_right": "Four-finger swipe right",
     "horns_hold": "Horns hold",
     "thumb_pinky_hold": "Thumb + pinky hold",
+    "palm_slide_left": "Open hand slide left",
+    "palm_slide_right": "Open hand slide right",
+    "cross_x": "Crossed index fingers (X)",
 }
 
 
@@ -81,6 +87,10 @@ class GestureController:
         self.machine = GestureStateMachine()
         self.motion = MotionTracker()
         self.cursor = CursorController(screen)
+        self.frame = FrameGesture()
+        self.cross = CrossGesture()
+        self.capture: Callable[[str | None], Any] = take_screenshot  # replaced in tests
+        self.bin_query: Callable[[], tuple[int, int]] = recycle_bin.query  # replaced in tests
         self.paused = False
         self._pending_click_pos: tuple[int, int] | None = None
         self._titlebar_start: tuple[int, int] | None = None
@@ -95,6 +105,8 @@ class GestureController:
         self.classifier.configure(gestures)
         self.stabilizer.configure(gestures)
         self.machine.configure(gestures)
+        self.frame.configure(self.machine.cfg.get("screenshot", {}))
+        self.cross.configure(self.machine.cfg.get("cross_x", {}))
         self.cursor.configure(settings.get("cursor", {}))
         self.window_cfg = self.machine.cfg.get("window_move", {})
 
@@ -136,6 +148,14 @@ class GestureController:
         self.activity.add("Control", "Resumed after emergency stop")
         self.notify("resumed", {})
 
+    def switch_hand(self) -> None:
+        """Control moved to the other hand: end any gesture the previous hand was holding."""
+        self._release_everything()
+        self.motion.reset()
+        self.stabilizer.reset()
+        self.classifier.reset()
+        self.cursor.reset()
+
     def _reset_tracking_state(self) -> None:
         self.machine.reset()
         self.stabilizer.reset()
@@ -160,7 +180,15 @@ class GestureController:
         self._release_everything()
 
     # ------------------------------------------------------------------ per-frame processing
-    def process(self, hand: TrackedHand | None, t: float, aspect: float = 4 / 3, mirrored: bool = True) -> FrameResult:
+    def process(
+        self,
+        hand: TrackedHand | None,
+        t: float,
+        aspect: float = 4 / 3,
+        mirrored: bool = True,
+        others: list[TrackedHand] | None = None,
+    ) -> FrameResult:
+        """Process one frame. ``others`` are the remaining visible hands (two-hand gestures)."""
         features = None
         if hand is not None:
             features = extract_features(hand.landmarks, hand.handedness, hand.score, aspect, mirrored)
@@ -172,6 +200,10 @@ class GestureController:
             decision = Decision(state=self.machine.state, pose=pose, label="Paused")
             return FrameResult(features, raw, pose, decision, self.cursor.position)
 
+        frame_result = self._frame_gesture(features, others or [], t, aspect, mirrored, pose)
+        if frame_result is not None:
+            return frame_result
+
         decision = self.machine.update(pose, features, t)
         if decision.cursor == "track" and raw in (Pose.PINCH_INDEX, Pose.PINCH_MIDDLE):
             # A pinch is forming but not yet confirmed by the debouncer: hold the cursor still so
@@ -181,6 +213,53 @@ class GestureController:
         for event in decision.events:
             self._execute(event)
         return FrameResult(features, raw, pose, decision, cursor_pos)
+
+    def _frame_gesture(self, features, others, t, aspect, mirrored, pose) -> FrameResult | None:
+        """Two-hand camera-frame gesture. Returns a result while it owns the hands, else None."""
+        # Only start from a neutral state so a drag / window move is never interrupted.
+        if self.machine.stopped or self.machine.state not in (State.IDLE, State.POINTING):
+            self.frame.update([], t)
+            self.cross.update([], t)
+            return None
+        hands = [features] if features is not None else []
+        hands += [extract_features(h.landmarks, h.handedness, h.score, aspect, mirrored) for h in others]
+
+        cross = self.cross.update(hands, t)
+        if cross.active:
+            self.frame.update([], t)
+            action = self.machine.cfg.get("mappings", {}).get("cross_x", "none")
+            title = action.replace("_", " ").title()
+            decision = Decision(state=self.machine.state, pose=pose, cursor="freeze", label=f"X: {title}",
+                                progress=cross.progress, progress_label=title)
+            self.cursor.freeze()
+            if cross.fired:
+                self.machine.trigger("cross_x", t, decision)
+                for event in decision.events:
+                    self._execute(event)
+            elif cross.progress >= 1.0:
+                decision.label = "Done - uncross your fingers"
+            return FrameResult(features, pose, pose, decision, self.cursor.position)
+
+        status = self.frame.update(hands, t)
+        if not status.active:
+            return None
+        decision = Decision(state=self.machine.state, pose=pose, cursor="freeze", label="Screenshot",
+                            progress=status.progress, progress_label="Screenshot")
+        self.cursor.freeze()
+        if status.fired:
+            folder = self.machine.cfg.get("screenshot", {}).get("folder") or None
+            try:
+                path = self.capture(folder)
+                self.activity.add("Two-hand frame", f"Screenshot saved to {path}")
+                self.notify("screenshot", {"path": str(path)})
+                decision.label = "Screenshot saved"
+            except Exception as exc:
+                log.exception("Screenshot failed")
+                self.activity.add("Two-hand frame", "Screenshot", success=False, error=str(exc))
+                decision.label = "Screenshot failed"
+        elif status.progress >= 1.0:
+            decision.label = "Screenshot taken - lower your hands"
+        return FrameResult(features, pose, pose, decision, self.cursor.position)
 
     def _apply_cursor(self, d: Decision, t: float) -> tuple[int, int] | None:
         mode = d.cursor
@@ -263,6 +342,12 @@ class GestureController:
                         self.windows.end_move()
                 self.activity.add(gesture, "Emergency stop - all gesture actions disabled")
                 self.notify("emergency_stop", {"source": "gesture"})
+            elif kind == Ev.RESUME:
+                # The state machine already reset itself; only the cursor filter needs a fresh start.
+                self.cursor.reset()
+                self._pending_click_pos = None
+                self.activity.add(gesture, "Resumed after emergency stop")
+                self.notify("resumed", {})
         except Exception as exc:
             self.activity.add(gesture, kind.replace("_", " "), success=False, error=str(exc))
             if kind == Ev.WINDOW_MOVE:
@@ -311,6 +396,9 @@ class GestureController:
         action = event.data["action"]
         gesture = TRIGGER_GESTURE.get(event.data.get("trigger", ""), "Window gesture")
         target = self.window_cfg.get("target", "active")
+        if action == "empty_recycle_bin":
+            self._ask_empty_recycle_bin(gesture)
+            return
         if action == "close" and event.data.get("dialog"):
             info = self.windows.target(target)
             if info.pid == self.windows.own_pid:
@@ -320,6 +408,17 @@ class GestureController:
             return
         message = self.windows.command(action, target)
         self.activity.add(gesture, message)
+
+
+    def _ask_empty_recycle_bin(self, gesture: str) -> None:
+        """Deleting is permanent: never empty directly, ask the GUI to confirm first."""
+        items, size = self.bin_query()
+        if items == 0:
+            self.activity.add(gesture, "Recycle Bin is already empty")
+            self.notify("recycle_bin_empty", {})
+            return
+        self.activity.add(gesture, f"Asking to confirm emptying the Recycle Bin ({items} items)")
+        self.notify("confirm_empty_bin", {"items": items, "bytes": size})
 
 
 def pose_label(pose: Pose) -> str:

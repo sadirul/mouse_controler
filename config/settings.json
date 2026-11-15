@@ -8,7 +8,7 @@
   },
   "tracking": {
     "max_fps": 30,
-    "preferred_hand": "right",
+    "preferred_hand": "any",
     "min_detection_confidence": 0.6,
     "min_presence_confidence": 0.5,
     "min_tracking_confidence": 0.5,
@@ -16,7 +16,7 @@
   },
   "cursor": {
     "mode": "absolute",
-    "speed": 1.0,
+    "speed": 1.55,
     "smoothing": 0.55,
     "responsiveness": 0.5,
     "acceleration": 0.6,

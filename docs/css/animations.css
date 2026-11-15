@@ -194,6 +194,55 @@
 @keyframes em-badge { 0%, 44% { opacity: 0; transform: scale(0.8); } 50%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; } }
 @keyframes em-cursor { 0%, 44% { fill: var(--cursor); } 46%, 92% { fill: var(--danger); } 96%, 100% { fill: var(--cursor); } }
 
+/* 14. two-hand frame -> screenshot ----------------------------------------------------------------- */
+.demo-hand.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.demo-hand.pair .mirror { transform: scaleX(-1); }
+.demo-screenshot .demo-hand.pair > .hand-svg, .demo-screenshot .demo-hand.pair .mirror { animation: ss-hands var(--t) ease-in-out infinite; }
+.demo-screenshot .shot-corners { fill: none; stroke: var(--accent-2); stroke-width: 3; stroke-linecap: round; }
+.demo-screenshot .shot-frame { animation: ss-frame var(--t) ease-out infinite; }
+.demo-screenshot .shot-flash { fill: #ffffff; opacity: 0; animation: ss-flash var(--t) ease-out infinite; }
+.demo-screenshot .shot-saved { animation: ss-saved var(--t) ease-out infinite; }
+@keyframes ss-hands { 0% { opacity: 0; translate: 0 16px; } 10%, 70% { opacity: 1; translate: 0 0; } 85%, 100% { opacity: 0; translate: 0 16px; } }
+@keyframes ss-frame { 0%, 10% { opacity: 0; } 18%, 44% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes ss-flash { 0%, 42% { opacity: 0; } 45% { opacity: 0.9; } 56%, 100% { opacity: 0; } }
+@keyframes ss-saved { 0%, 48% { opacity: 0; transform: translate(0, 10px); } 54%, 88% { opacity: 1; transform: translate(0, 0); } 96%, 100% { opacity: 0; } }
+
+/* 15. mapped gesture -> empty Recycle Bin (confirmed) ---------------------------------------------- */
+.demo-recycle-bin .hold-ring { animation: rb-ring var(--t) linear infinite; }
+.demo-recycle-bin .bin-dialog { transform-box: fill-box; transform-origin: center; animation: rb-dialog var(--t) ease-out infinite; }
+.demo-recycle-bin .bin-trash { animation: rb-trash var(--t) ease-in infinite; }
+.demo-recycle-bin .bin-yes { animation: rb-yes var(--t) linear infinite; }
+.demo-recycle-bin .bin-cursor .cursor-path { animation: rb-cursor var(--t) linear infinite; }
+@keyframes rb-ring { 0%, 6% { stroke-dashoffset: var(--c); } 26%, 100% { stroke-dashoffset: 0; } }
+@keyframes rb-dialog { 0%, 27% { opacity: 0; transform: scale(0.9); } 32%, 62% { opacity: 1; transform: scale(1); } 66%, 100% { opacity: 0; } }
+@keyframes rb-yes { 0%, 52% { fill: var(--btn); } 54%, 60% { fill: var(--accent-2); } 62%, 100% { fill: var(--btn); } }
+@keyframes rb-cursor { 0%, 33% { opacity: 0; } 36%, 64% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes rb-trash { 0%, 64% { opacity: 1; transform: translate(0, 0); } 74%, 94% { opacity: 0; transform: translate(0, 14px); } 100% { opacity: 1; transform: translate(0, 0); } }
+
+/* lock screen (used by the X demo) ---------------------------------------------------------------- */
+.lock-bg { fill: #1e3a5f; }
+.lock-time { font: 300 26px "Segoe UI", sans-serif; fill: #ffffff; }
+.lock-avatar { fill: #93c5fd; }
+.lock-pad { fill: #ffffff; }
+.lock-shackle { fill: none; stroke: #ffffff; stroke-width: 2.2; }
+@keyframes lock-in { 0%, 36% { opacity: 0; } 42%, 88% { opacity: 1; } 96%, 100% { opacity: 0; } }
+
+/* 16. open-hand slide -> next / previous app ------------------------------------------------------- */
+.demo-palm-slide .hand { animation: ps-hand var(--t) ease-in-out infinite; }
+.demo-palm-slide .flip-a { animation: ps-a var(--t) ease-in-out infinite; }
+.demo-palm-slide .flip-b { animation: ps-b var(--t) ease-in-out infinite; }
+@keyframes ps-hand { 0%, 10% { transform: translate(-40px, 0); } 26%, 50% { transform: translate(40px, 0); } 66%, 90% { transform: translate(-40px, 0); } 100% { transform: translate(-40px, 0); } }
+@keyframes ps-a { 0%, 12% { transform: translate(0, 0); opacity: 1; } 24%, 52% { transform: translate(-150px, 0); opacity: 0; } 64%, 100% { transform: translate(0, 0); opacity: 1; } }
+@keyframes ps-b { 0%, 14% { transform: translate(14px, 0); opacity: 0.55; } 26%, 50% { transform: translate(-6px, -4px); opacity: 1; } 62%, 100% { transform: translate(14px, 0); opacity: 0.55; } }
+
+/* 17. crossed index fingers (X) -> lock Windows ------------------------------------------------- */
+.demo-cross-x .demo-hand.pair { overflow: visible; }
+.demo-cross-x .demo-hand.pair > .hand-svg { transform-origin: 50% 90%; animation: cx-left var(--t) ease-in-out infinite; }
+.demo-cross-x .demo-hand.pair .mirror { transform-origin: 50% 90%; animation: cx-right var(--t) ease-in-out infinite; }
+.demo-cross-x .lock-screen { animation: lock-in var(--t) ease-out infinite; }
+@keyframes cx-left { 0%, 8% { transform: translateX(-10%) rotate(0deg); } 26%, 70% { transform: translateX(22%) rotate(44deg); } 88%, 100% { transform: translateX(-10%) rotate(0deg); } }
+@keyframes cx-right { 0%, 8% { transform: scaleX(-1) translateX(-10%) rotate(0deg); } 26%, 70% { transform: scaleX(-1) translateX(22%) rotate(44deg); } 88%, 100% { transform: scaleX(-1) translateX(-10%) rotate(0deg); } }
+
 /* hero: hand steering a cursor --------------------------------------------------------------------- */
 .hero-demo .hand { animation: move-hand 7s ease-in-out infinite; }
 .hero-demo .cursor { animation: move-cursor 7s ease-in-out infinite; }

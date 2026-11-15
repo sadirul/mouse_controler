@@ -192,6 +192,19 @@ class WindowController:
     # ------------------------------------------------------------------ commands
     def command(self, action: str, mode: str = "active") -> str:
         """Execute a window command and return a human readable description."""
+        if action in ("next_app", "previous_app"):
+            from app import app_switcher
+
+            try:
+                return app_switcher.switch("next" if action == "next_app" else "previous")
+            except app_switcher.AppSwitchError as exc:
+                raise WindowError(str(exc)) from exc
+        if action == "lock_screen":
+            if not IS_WINDOWS:
+                raise WindowError("Locking the computer is only supported on Windows")
+            if not user32.LockWorkStation():
+                raise WindowError("Windows refused to lock the computer")
+            return "Locked Windows (Win+L)"
         self._require()
         if action == "switch_app":
             from app.keyboard_controller import KeyboardController

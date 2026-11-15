@@ -179,7 +179,10 @@ class DashboardPage(QWidget):
                 f"Global hotkeys: pause/resume {pretty(self.settings.get('app.hotkey_pause'))} · "
                 f"emergency stop {pretty(self.settings.get('app.hotkey_emergency'))} · "
                 f"resume {pretty(self.settings.get('app.hotkey_resume'))}.  "
-                f"Gesture: hold an open palm for {self.settings.get('gestures.emergency_stop.hold_ms') / 1000:.1f} s.")
+                f"Gesture: hold an open palm for {self.settings.get('gestures.emergency_stop.hold_ms') / 1000:.1f} s"
+                + (f"; resume by holding a {self.settings.get('gestures.resume.pose')} for "
+                   f"{self.settings.get('gestures.resume.hold_ms') / 1000:.1f} s."
+                   if self.settings.get('gestures.resume.enabled') else "."))
         else:
             self.hotkey_hint.setText("Global hotkeys are disabled (Settings).")
 

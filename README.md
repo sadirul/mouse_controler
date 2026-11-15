@@ -66,9 +66,17 @@ Command-line options: `--minimized` (start in the tray), `--start-tracking`, `--
 | Thumb + pinky pinch | Hold 0.7 s, then repeat within 4 s | Close window (remappable) |
 | Fist | Close hand | Freeze cursor (reposition your hand) |
 | Open palm | Hold 1.5 s | **Emergency stop** |
+| Fist (while stopped) | Hold 2 s | Resume after an emergency stop (fist or horns; can be turned off) |
+| Two-hand L-frame (thumb + index out on both hands) | Hold 0.8 s | Screenshot of all monitors -> `Pictures\Screenshots\Screenshot_<date>_<time>.png` |
+| Any mapped gesture (horns / thumb + pinky / swipe / slide / X) | Do the gesture | Empty Recycle Bin - always confirmed in a dialog; also in the tray menu |
+| Open hand slide right / left | Quick sideways slide | Next app / previous app (carousel; remappable) |
+| Both index fingers crossed like an X | Hold 0.5 s | Lock Windows (Win+L, remappable) |
+
+Either hand can control the mouse (Camera -> Controlling hand, default *Either*). With both hands
+visible, the hand already in control keeps it.
 
 Safety hotkeys (system-wide): `Ctrl+Alt+P` pause/resume, `Ctrl+Alt+X` emergency stop,
-`Ctrl+Alt+R` resume after an emergency stop. Gestures can never resume control after a stop.
+`Ctrl+Alt+R` resume after an emergency stop.
 
 ## Building the Windows executable
 
@@ -88,7 +96,7 @@ All settings pages apply immediately and persist to JSON:
 | File | Contents |
 |---|---|
 | `config/settings.json` | camera (device, resolution, FPS, mirror), tracking (FPS cap, hand, confidences), cursor (mode, speed, smoothing, acceleration, dead zone, region, monitor), app (tray, autostart, hotkeys) |
-| `config/gestures.json` | per gesture: `enabled`, thresholds, `min_ms` detection time, `cooldown_ms`, durations; scroll/window options; `mappings` for window commands; emergency stop |
+| `config/gestures.json` | per gesture: `enabled`, thresholds, `min_ms` detection time, `cooldown_ms`, durations; scroll/window options; `mappings` for window commands; emergency stop; resume gesture; screenshot (`hold_ms`, `cooldown_ms`, `folder`) |
 
 When running from source the files live in `config/`; the packaged app uses
 `%APPDATA%\HandGestureMouse\config` (seeded from the bundled defaults on first run). Missing or
@@ -138,7 +146,7 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-128 automated tests cover finger detection, classification (both hands), pinch hysteresis,
+160 automated tests cover finger detection, classification (both hands), pinch hysteresis,
 debouncing, click / double click / long press / drag state, duplicate-click prevention, scroll
 direction and axis lock, window gestures and close confirmation, gesture priority, emergency stop,
 pause, tracking dropouts, cursor mapping/smoothing/multi-monitor, and settings persistence. All

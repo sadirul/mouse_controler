@@ -546,6 +546,42 @@ def test_emergency_hold_configurable(sim: Sim):
     assert sim.controller.stopped
 
 
+def test_resume_gesture_after_emergency_stop(sim: Sim):
+    sim.hold("open_palm", 1700)
+    assert sim.controller.stopped
+    sim.hold("fist", 1000)  # too short
+    assert sim.controller.stopped
+    sim.hold("fist", 2300)
+    assert not sim.controller.stopped
+    assert any(k == "resumed" for k, _ in sim.notices)
+    n = len(sim.backend.calls)
+    sim.hold("point", 300, move=(0.1, 0))
+    assert len(sim.backend.calls) > n, "cursor moves again after resuming"
+
+
+def test_resume_gesture_can_be_disabled(sim: Sim):
+    sim.config["gestures"]["resume"]["enabled"] = False
+    sim.controller.configure(sim.config)
+    sim.hold("open_palm", 1700)
+    sim.hold("fist", 3000)
+    assert sim.controller.stopped
+
+
+def test_resume_pose_must_be_released_before_its_action():
+    cfg = default_config()["gestures"]
+    cfg["resume"]["pose"] = "horns"
+    cfg["resume"]["hold_ms"] = 500
+    m = GestureStateMachine(cfg)
+    m.state = State.STOPPED
+    horns = features_for("horns")
+    t, events = 0.0, []
+    for _ in range(90):  # 3 s of horns: resumes, but must not also trigger switch_app
+        t += 1 / 30
+        events += m.update(Pose.HORNS, horns, t).kinds()
+    assert Ev.RESUME in events and Ev.WINDOW_COMMAND not in events
+    assert m.state == State.WAIT_RELEASE
+
+
 def test_manual_emergency_stop_releases_buttons(sim: Sim):
     sim.hold("point", 300)
     sim.hold("pinch_index", 1200)

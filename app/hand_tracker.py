@@ -113,8 +113,18 @@ class HandTracker:
             pass
 
 
-def select_hand(hands: list[TrackedHand], preferred: str, min_score: float = 0.0) -> TrackedHand | None:
-    """Pick the controlling hand. ``preferred`` is "right", "left" or "any"."""
+def select_hand(
+    hands: list[TrackedHand],
+    preferred: str,
+    min_score: float = 0.0,
+    previous: str | None = None,
+) -> TrackedHand | None:
+    """Pick the controlling hand. ``preferred`` is "right", "left" or "any".
+
+    With "any" either hand can control the mouse. ``previous`` is the handedness of the hand that
+    was in control last frame: while it is still visible it keeps control, so showing the other
+    hand as well does not make control jump between hands mid-gesture.
+    """
     candidates = [h for h in hands if h.score >= min_score] or []
     if not candidates:
         return None
@@ -124,4 +134,8 @@ def select_hand(hands: list[TrackedHand], preferred: str, min_score: float = 0.0
         if not matching:
             return None
         return max(matching, key=lambda h: h.score)
+    if previous is not None:
+        same = [h for h in candidates if h.handedness == previous]
+        if same:
+            return max(same, key=lambda h: h.score)
     return max(candidates, key=lambda h: h.score)

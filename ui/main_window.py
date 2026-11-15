@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 from app import APP_NAME, __version__
 from app.hotkeys import HotkeyManager
 from app.logger import ActivityLog
+from app import recycle_bin
 from app.paths import asset_path
 from app.settings_manager import SettingsManager
 from app.tracking_worker import TrackingWorker
@@ -165,8 +166,9 @@ class MainWindow(QMainWindow):
         self.act_track = QAction("Start tracking", self, triggered=self._tray_toggle_tracking)
         self.act_pause = QAction("Pause gestures", self, triggered=self.toggle_pause)
         self.act_stop = QAction("Emergency stop", self, triggered=lambda: self._tray_emergency())
+        self.act_bin = QAction("Empty Recycle Bin...", self, triggered=lambda: self.confirm_empty_recycle_bin("Tray menu"))
         self.act_exit = QAction("Exit", self, triggered=self.quit)
-        for a in (self.act_open, None, self.act_track, self.act_pause, self.act_stop, None, self.act_exit):
+        for a in (self.act_open, None, self.act_track, self.act_pause, self.act_stop, None, self.act_bin, None, self.act_exit):
             menu.addSeparator() if a is None else menu.addAction(a)
         self.tray.setContextMenu(menu)
         self.tray.activated.connect(self._tray_activated)
@@ -260,7 +262,7 @@ class MainWindow(QMainWindow):
         self.dashboard.set_stopped(stopped)
         if stopped and not self.isVisible():
             self.tray.showMessage(APP_NAME, "Emergency stop - gesture control is disabled. Open the dashboard "
-                                            "or press the resume hotkey to continue.", QSystemTrayIcon.MessageIcon.Warning)
+                                            "press the resume hotkey or hold the resume gesture to continue.", QSystemTrayIcon.MessageIcon.Warning)
         self._update_controls()
 
     def _notice(self, kind: str, data: dict) -> None:
@@ -275,6 +277,17 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(int(secs * 1000) + 300, self.dashboard.hide_notice)
         elif kind == "close_cancelled":
             self.dashboard.hide_notice()
+        elif kind == "screenshot":
+            path = data.get("path", "")
+            self.dashboard.show_notice(f"Screenshot saved: {path}", theme.OK)
+            QTimer.singleShot(4000, self.dashboard.hide_notice)
+            if not self.isVisible():
+                self.tray.showMessage(APP_NAME, f"Screenshot saved: {path}", QSystemTrayIcon.MessageIcon.Information, 3000)
+        elif kind == "confirm_empty_bin":
+            self.confirm_empty_recycle_bin("Gesture", data.get("items"), data.get("bytes"))
+        elif kind == "recycle_bin_empty":
+            self.dashboard.show_notice("The Recycle Bin is already empty.", theme.OK)
+            QTimer.singleShot(3000, self.dashboard.hide_notice)
         elif kind == "confirm_close":
             self._confirm_close(data["hwnd"], data.get("title", ""))
 
@@ -292,6 +305,42 @@ class MainWindow(QMainWindow):
             self.worker.close_window(hwnd)
         else:
             self.activity.add("Close confirmation", "Close cancelled in dialog")
+
+    def confirm_empty_recycle_bin(self, source: str, items: int | None = None, size: int | None = None) -> None:
+        """Ask before permanently deleting everything in the Recycle Bin, then empty it."""
+        try:
+            if items is None or size is None:
+                items, size = recycle_bin.query()
+        except recycle_bin.RecycleBinError as exc:
+            self.activity.add(source, "Empty Recycle Bin", success=False, error=str(exc))
+            self.dashboard.show_notice(str(exc), theme.DANGER)
+            return
+        if items == 0:
+            self.activity.add(source, "Recycle Bin is already empty")
+            self.dashboard.show_notice("The Recycle Bin is already empty.", theme.OK)
+            QTimer.singleShot(3000, self.dashboard.hide_notice)
+            return
+        box = QMessageBox(self)
+        box.setWindowTitle("Empty Recycle Bin?")
+        box.setIcon(QMessageBox.Icon.Warning)
+        box.setText(f"Permanently delete <b>{items} item{'s' if items != 1 else ''}</b> "
+                    f"({recycle_bin.human_size(size)}) from the Recycle Bin?")
+        box.setInformativeText("This cannot be undone.")
+        box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        box.setDefaultButton(QMessageBox.StandardButton.No)
+        box.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
+        if box.exec() != QMessageBox.StandardButton.Yes:
+            self.activity.add(source, "Empty Recycle Bin cancelled")
+            return
+        try:
+            deleted = recycle_bin.empty()
+        except recycle_bin.RecycleBinError as exc:
+            self.activity.add(source, "Empty Recycle Bin", success=False, error=str(exc))
+            self.dashboard.show_notice(str(exc), theme.DANGER)
+            return
+        self.activity.add(source, f"Emptied the Recycle Bin ({deleted} items)")
+        self.dashboard.show_notice(f"Recycle Bin emptied ({deleted} items).", theme.OK)
+        QTimer.singleShot(4000, self.dashboard.hide_notice)
 
     # ------------------------------------------------------------------ status display
     def _update_controls(self) -> None:
@@ -321,7 +370,7 @@ class MainWindow(QMainWindow):
             if not self.worker.preview_enabled:
                 self.dashboard.preview.set_image(None)
                 self.dashboard.preview.setText("Preview disabled in Settings")
-        if path.startswith("gestures.emergency_stop"):
+        if path.startswith(("gestures.emergency_stop", "gestures.resume")):
             self.dashboard.refresh_hotkeys()
 
     def _settings_reset(self) -> None:

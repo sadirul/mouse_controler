@@ -27,6 +27,10 @@ WINDOW_ACTION_LABELS = [
     ("snap_left", "Move window to left half"),
     ("snap_right", "Move window to right half"),
     ("move_top", "Move window to top of screen"),
+    ("empty_recycle_bin", "Empty Recycle Bin (asks to confirm)"),
+    ("lock_screen", "Lock Windows (Win+L)"),
+    ("next_app", "Next app (flip forward)"),
+    ("previous_app", "Previous app (flip back)"),
 ]
 
 # (key, title, art, description, action, enable path, controls)
@@ -118,13 +122,45 @@ GESTURES = [
        [("gesture", "Repeat the gesture to confirm"), ("dialog", "Show a confirmation dialog")]),
       ("slider", "Confirmation window", "gestures.close_confirm.window_ms", 1500, 8000, 100, ms, int),
       ("slider", "Pinch threshold", "gestures.thumb_pinky.pinch_threshold", 0.1, 0.6, 0.01, hs, float)]),
+    ("palm_slide", "Flip between apps", "palm_slide",
+     "Open your hand (all fingers spread) and slide it quickly sideways, like flipping between apps on a "
+     "phone. Slide right for the next app, left to go back. Slide again to keep flipping; the swing back "
+     "after a slide is ignored.",
+     "Next / previous app (remappable)", "gestures.palm_slide.enabled",
+     [("mapping", "Slide right", "palm_slide_right"), ("mapping", "Slide left", "palm_slide_left"),
+      ("slider", "Slide distance", "gestures.palm_slide.distance", 0.6, 3.0, 0.05, hs, float),
+      ("slider", "Max slide time", "gestures.palm_slide.window_ms", 150, 800, 10, ms, int),
+      ("slider", "Ignore swing-back for", "gestures.palm_slide.return_ms", 0, 2000, 50, ms, int)]),
+    ("cross_x", "Cross fingers (X)", "cross_x",
+     "Point both index fingers (other fingers folded) and cross them in front of the camera like an X. "
+     "Hold for half a second.",
+     "Configurable (default: lock Windows, like Win+L)", "gestures.cross_x.enabled",
+     [("mapping", "Action", "cross_x"),
+      ("slider", "Hold duration", "gestures.cross_x.hold_ms", 100, 2000, 50, ms, int),
+      ("slider", "Cooldown", "gestures.cross_x.cooldown_ms", 0, 8000, 100, ms, int)]),
     ("emergency_stop", "Emergency stop", "emergency_stop",
      "Show an open palm (all five fingers extended) to the camera and hold it. All mouse and window actions stop "
-     "immediately and stay off until you press Resume. Has priority over every other gesture.",
+     "immediately and stay off until you resume (resume gesture, Resume button, tray menu or hotkey). "
+     "Has priority over every other gesture.",
      "Disables all gesture actions", "gestures.emergency_stop.enabled",
      [("slider", "Hold duration", "gestures.emergency_stop.hold_ms", 500, 4000, 50, ms, int),
       ("toggle", "Palm must face the camera", "gestures.emergency_stop.require_palm_facing",
        "Stricter, but may fail if the hand's left/right detection is uncertain.")]),
+    ("screenshot", "Screenshot (two-hand frame)", "screenshot",
+     "Make an L with each hand - thumb and index finger out, other fingers folded - as if framing a photo, "
+     "and hold both hands up together. The whole screen is saved as a PNG in Pictures/Screenshots. "
+     "Lower your hands before taking the next one.",
+     "Saves a screenshot", "gestures.screenshot.enabled",
+     [("slider", "Hold duration", "gestures.screenshot.hold_ms", 200, 3000, 50, ms, int),
+      ("slider", "Cooldown", "gestures.screenshot.cooldown_ms", 0, 6000, 100, ms, int)]),
+    ("resume", "Resume after emergency stop", "resume",
+     "While the emergency stop is active, make a fist (or the selected pose) and hold it to turn gesture "
+     "control back on. Release the pose afterwards to continue. Turn this off if only the Resume button, "
+     "tray menu or hotkey should be able to resume.",
+     "Re-enables gesture control", "gestures.resume.enabled",
+     [("combo", "Gesture", "gestures.resume.pose",
+       [("fist", "Fist"), ("horns", "Horns (index + pinky)")]),
+      ("slider", "Hold duration", "gestures.resume.hold_ms", 500, 4000, 50, ms, int)]),
 ]
 
 

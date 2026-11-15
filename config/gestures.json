@@ -83,13 +83,39 @@
       "hold_ms": 1500,
       "require_palm_facing": false
     },
+    "resume": {
+      "enabled": true,
+      "pose": "fist",
+      "hold_ms": 2000
+    },
+    "screenshot": {
+      "enabled": true,
+      "hold_ms": 800,
+      "cooldown_ms": 2000,
+      "folder": ""
+    },
+    "cross_x": {
+      "enabled": true,
+      "hold_ms": 500,
+      "cooldown_ms": 3000
+    },
+    "palm_slide": {
+      "enabled": true,
+      "distance": 1.2,
+      "window_ms": 400,
+      "cooldown_ms": 500,
+      "return_ms": 900
+    },
     "mappings": {
       "four_swipe_up": "maximize",
       "four_swipe_down": "restore_or_minimize",
       "four_swipe_left": "snap_left",
       "four_swipe_right": "snap_right",
       "horns_hold": "switch_app",
-      "thumb_pinky_hold": "close"
+      "thumb_pinky_hold": "close",
+      "palm_slide_left": "previous_app",
+      "palm_slide_right": "next_app",
+      "cross_x": "lock_screen"
     }
   }
 }

@@ -31,6 +31,7 @@ POSES: dict[str, dict[str, tuple[float, float]]] = {
     "three": {"index": (-4, 1), "middle": (-1, 1), "ring": (3, 1), "pinky": (10, FOLD), "thumb": TUCK},
     "four": {"index": (-6, 1), "middle": (-1, 1), "ring": (4, 1), "pinky": (10, 1), "thumb": TUCK},
     "horns": {"index": (-8, 1), "middle": (-1, FOLD), "ring": (4, FOLD), "pinky": (12, 1), "thumb": TUCK},
+    "frame": {"index": (-6, 1), "middle": (-1, FOLD), "ring": (4, FOLD), "pinky": (10, FOLD), "thumb": (-70, 1)},
     "fist": {"index": (-6, FOLD), "middle": (-1, FOLD), "ring": (4, FOLD), "pinky": (10, FOLD), "thumb": TUCK},
 }
 
@@ -154,6 +155,11 @@ GESTURE_ART = {
     "thumb_pinky": ("pinch_pinky", ("pinky", "thumb"), lambda: _badge("x2", 170)),
     "emergency_stop": ("open", ("thumb", "index", "middle", "ring", "pinky"), lambda: '<circle cx="100" cy="120" r="112" fill="none" stroke="#f43f5e" stroke-width="5" stroke-dasharray="14 8"/>'),
     "fist": ("fist", (), lambda: ""),
+    "recycle_bin": ("horns", ("index", "pinky"), lambda: f'<g stroke="{CYAN}" stroke-width="3" fill="#1e2230" stroke-linejoin="round"><path d="M156 26 h32 l-3 40 h-26 z"/><line x1="150" y1="22" x2="194" y2="22" stroke-linecap="round"/><path d="M165 22 v-5 h14 v5" fill="none"/></g><g stroke="{CYAN}" stroke-width="2"><line x1="166" y1="33" x2="167" y2="59"/><line x1="172" y1="33" x2="172" y2="59"/><line x1="178" y1="33" x2="177" y2="59"/></g>'),
+    "palm_slide": ("open", ("thumb", "index", "middle", "ring", "pinky"), lambda: _arrow(176, 40, 210, 40) + _arrow(164, 40, 130, 40)),
+    "cross_x": ("point", ("index",), lambda: f'<g stroke="{CYAN}" stroke-width="7" stroke-linecap="round"><line x1="150" y1="18" x2="196" y2="64"/><line x1="196" y1="18" x2="150" y2="64"/></g>' + _badge("Win+L", 172, 88)),
+    "screenshot": ("frame", ("index", "thumb"), lambda: f'<path d="M150 18 h40 v28" fill="none" stroke="{CYAN}" stroke-width="4" stroke-linecap="round"/>' + _badge("x2", 170, 74)),
+    "resume": ("fist", (), lambda: '<circle cx="100" cy="120" r="112" fill="none" stroke="#22c55e" stroke-width="5"/>' + _badge("ON", 172, 24)),
 }
 
 

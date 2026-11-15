@@ -85,8 +85,13 @@ Start each session with **Start tracking** and confirm the preview shows 21 land
 | Dim room | Hand still detected; note jitter; adjust smoothing | |
 | Backlight (window behind user) | Note detection rate | |
 | Right hand control | Controlling hand = Right; left hand is ignored | |
+| Either hand control (default) | Left or right hand moves the cursor; with both visible, the hand already in control keeps it | |
+| Resume gesture | During an emergency stop, hold a fist 2 s: control resumes; opening the hand afterwards does nothing unexpected | |
+| Two-hand screenshot | L-shape with both hands, hold 0.8 s: one PNG in Pictures/Screenshots, cursor stays still, notice shows the path | |
+| Flip between apps | Open hand slid right brings the next app forward, left goes back; the swing back after a slide does not flip again; minimized apps are restored; sliding never triggers the emergency stop | |
+| X -> lock | Cross both index fingers, hold 0.5 s: Windows locks once; fingers side by side or barely tilted do nothing; an X with thumbs out does not take a screenshot | |
+| Empty Recycle Bin | Map Horns hold to "Empty Recycle Bin", do it: dialog shows item count; No cancels, Yes empties; empty bin shows a notice only; tray menu item works | |
 | Left hand control | Controlling hand = Left; full gesture list with the left hand | |
-| Either hand | Both hands work; with two hands visible the more confident one controls | |
 | Windows 10 22H2 | Full list + packaged exe | |
 | Windows 11 23H2 / 24H2 | Full list + packaged exe | |
 | Clean machine (no Python) | Unzip `dist\HandGestureMouse`, run exe, `--self-test`, full list | |

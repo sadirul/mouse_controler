@@ -122,8 +122,9 @@ class CameraSettingsPage(QWidget):
 
         track = Card("Hand tracking")
         track.add(Row("Controlling hand", self.binder.combo(QComboBox(), "tracking.preferred_hand",
-                                                             [("right", "Right hand"), ("left", "Left hand"), ("any", "Either hand")]),
-                      "Only the selected hand controls the mouse; the other hand is ignored."))
+                                                             [("any", "Either hand"), ("right", "Right hand"), ("left", "Left hand")]),
+                      "Either hand: use your left or right hand. If both are visible, the hand that "
+                      "was already in control keeps it. Right/Left: the other hand is ignored."))
         track.add(self.binder.slider(SliderRow("Max tracking FPS", 10, 60, settings.get("tracking.max_fps"), 1,
                                                lambda v: f"{v:.0f}"), "tracking.max_fps", int))
         track.add(self.binder.slider(SliderRow("Detection confidence", 0.3, 0.95, settings.get("tracking.min_detection_confidence"), 0.05,
